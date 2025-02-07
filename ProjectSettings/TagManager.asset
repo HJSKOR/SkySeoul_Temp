@@ -5,30 +5,29 @@ TagManager:
   serializedVersion: 2
   tags:
   - Static
-  - GameManager
-  - Projectile
   - WeaponManager
+  - Projectile
   - BodyPart
-  - AI
+  - GameManager
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
+  - Monster
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   - Movie
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
   - 
   - 
   - 
