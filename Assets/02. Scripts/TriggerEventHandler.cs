@@ -3,9 +3,9 @@ using UnityEngine.Events;
 
 public class TriggerEventHandler : MonoBehaviour
 {
-    public event UnityAction<Collider> OnEnter;
-    public event UnityAction<Collider> OnStay;
-    public event UnityAction<Collider> OnExit;
+    public UnityEvent<Collider> OnEnter;
+    public UnityEvent<Collider> OnStay;
+    public UnityEvent<Collider> OnExit;
 
     private void OnTriggerEnter(Collider other)
     {

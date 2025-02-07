@@ -19,8 +19,8 @@ namespace Battle
                 _henchmen = new(transform, Agent);
                 _henchmen.Team = Team;
             }
-            _triggerEvent.OnEnter += (s) => { _attack = true; };
-            _triggerEvent.OnExit += (s) => { _attack = false; };
+            _triggerEvent.OnEnter.AddListener((s) => { _attack = true; });
+            _triggerEvent.OnExit.AddListener((s) => { _attack = false; });
         }
         private void Update()
         {
