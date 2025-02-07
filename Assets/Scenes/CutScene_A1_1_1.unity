@@ -1919,6 +1919,22 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 17
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: bf0478f4dbeff5c479e9c65359d2d8d2,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: abd2e68205f292e4c9957fabc0168b38, type: 2}
+    - target: {fileID: 5866666021909216657, guid: bf0478f4dbeff5c479e9c65359d2d8d2,
+        type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'Bip001 R Finger21'\n\tTransform 'Bip001
+        R Finger02'\n\tTransform 'Bip001 R Clavicle'\n\tTransform 'Bip001 L Finger21'\n\tTransform
+        'Bip001 L Finger02'\n\tTransform 'Bip001 L Finger1'\n\tTransform 'Bip001
+        R Finger22'\n\tTransform 'Bip001 L Finger22'\n\tTransform 'Bip001 L Forearm'\n\tTransform
+        'Bip001 L Clavicle'\n\tand more ..."
+      objectReference: {fileID: 0}
     - target: {fileID: 6126604195352524321, guid: bf0478f4dbeff5c479e9c65359d2d8d2,
         type: 3}
       propertyPath: m_Layer
@@ -2349,6 +2365,22 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 17
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: bf0478f4dbeff5c479e9c65359d2d8d2,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: abd2e68205f292e4c9957fabc0168b38, type: 2}
+    - target: {fileID: 5866666021909216657, guid: bf0478f4dbeff5c479e9c65359d2d8d2,
+        type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'Bip001 R Finger21'\n\tTransform 'Bip001
+        R Finger02'\n\tTransform 'Bip001 R Clavicle'\n\tTransform 'Bip001 L Finger21'\n\tTransform
+        'Bip001 L Finger02'\n\tTransform 'Bip001 L Finger1'\n\tTransform 'Bip001
+        R Finger22'\n\tTransform 'Bip001 L Finger22'\n\tTransform 'Bip001 L Forearm'\n\tTransform
+        'Bip001 L Clavicle'\n\tand more ..."
+      objectReference: {fileID: 0}
     - target: {fileID: 6126604195352524321, guid: bf0478f4dbeff5c479e9c65359d2d8d2,
         type: 3}
       propertyPath: m_Layer
@@ -2778,6 +2810,22 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: d4342625e559bcf49bff315c787821c8,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: abd2e68205f292e4c9957fabc0168b38, type: 2}
+    - target: {fileID: 5866666021909216657, guid: d4342625e559bcf49bff315c787821c8,
+        type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'Bip001 R Finger21'\n\tTransform 'Bip001
+        R Finger02'\n\tTransform 'Bip001 R Clavicle'\n\tTransform 'Bip001 L Finger21'\n\tTransform
+        'Bip001 L Finger02'\n\tTransform 'Bip001 L Finger1'\n\tTransform 'Bip001
+        R Finger22'\n\tTransform 'Bip001 L Finger22'\n\tTransform 'Bip001 L Forearm'\n\tTransform
+        'Bip001 L Clavicle'\n\tand more ..."
       objectReference: {fileID: 0}
     - target: {fileID: 6126604195352524321, guid: d4342625e559bcf49bff315c787821c8,
         type: 3}
@@ -3497,6 +3545,22 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: d4342625e559bcf49bff315c787821c8,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: abd2e68205f292e4c9957fabc0168b38, type: 2}
+    - target: {fileID: 5866666021909216657, guid: d4342625e559bcf49bff315c787821c8,
+        type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'Bip001 R Finger21'\n\tTransform 'Bip001
+        R Finger02'\n\tTransform 'Bip001 R Clavicle'\n\tTransform 'Bip001 L Finger21'\n\tTransform
+        'Bip001 L Finger02'\n\tTransform 'Bip001 L Finger1'\n\tTransform 'Bip001
+        R Finger22'\n\tTransform 'Bip001 L Finger22'\n\tTransform 'Bip001 L Forearm'\n\tTransform
+        'Bip001 L Clavicle'\n\tand more ..."
       objectReference: {fileID: 0}
     - target: {fileID: 6126604195352524321, guid: d4342625e559bcf49bff315c787821c8,
         type: 3}
@@ -5077,6 +5141,22 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 17
       objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: d4342625e559bcf49bff315c787821c8,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: abd2e68205f292e4c9957fabc0168b38, type: 2}
+    - target: {fileID: 5866666021909216657, guid: d4342625e559bcf49bff315c787821c8,
+        type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'Bip001 R Finger21'\n\tTransform 'Bip001
+        R Finger02'\n\tTransform 'Bip001 R Clavicle'\n\tTransform 'Bip001 L Finger21'\n\tTransform
+        'Bip001 L Finger02'\n\tTransform 'Bip001 L Finger1'\n\tTransform 'Bip001
+        R Finger22'\n\tTransform 'Bip001 L Finger22'\n\tTransform 'Bip001 L Forearm'\n\tTransform
+        'Bip001 L Clavicle'\n\tand more ..."
+      objectReference: {fileID: 0}
     - target: {fileID: 6126604195352524321, guid: d4342625e559bcf49bff315c787821c8,
         type: 3}
       propertyPath: m_Layer
@@ -6232,6 +6312,22 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: bf0478f4dbeff5c479e9c65359d2d8d2,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: abd2e68205f292e4c9957fabc0168b38, type: 2}
+    - target: {fileID: 5866666021909216657, guid: bf0478f4dbeff5c479e9c65359d2d8d2,
+        type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'Bip001 R Finger21'\n\tTransform 'Bip001
+        R Finger02'\n\tTransform 'Bip001 R Clavicle'\n\tTransform 'Bip001 L Finger21'\n\tTransform
+        'Bip001 L Finger02'\n\tTransform 'Bip001 L Finger1'\n\tTransform 'Bip001
+        R Finger22'\n\tTransform 'Bip001 L Finger22'\n\tTransform 'Bip001 L Forearm'\n\tTransform
+        'Bip001 L Clavicle'\n\tand more ..."
       objectReference: {fileID: 0}
     - target: {fileID: 6126604195352524321, guid: bf0478f4dbeff5c479e9c65359d2d8d2,
         type: 3}
