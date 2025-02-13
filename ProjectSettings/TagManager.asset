@@ -9,6 +9,7 @@ TagManager:
   - Projectile
   - BodyPart
   - GameManager
+  - Zombie
   layers:
   - Default
   - TransparentFX
