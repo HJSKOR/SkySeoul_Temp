@@ -18,12 +18,13 @@ public class Explosion : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("targetTage") && !string.IsNullOrEmpty(_targetTage))
+        if (!other.CompareTag(_targetTage) && !string.IsNullOrEmpty(_targetTage))
         {
             return;
         }
         if (other.TryGetComponent<Rigidbody>(out var rigid))
         {
+            other.GetComponentInParent<Animator>().enabled = false;
             rigid.isKinematic = false;
             var dir = (other.transform.position - transform.position).normalized;
 
