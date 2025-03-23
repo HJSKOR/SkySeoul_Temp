@@ -17,7 +17,8 @@ namespace Input1
             Attack,
             Guard,
             DebugLoad,
-            Cancel
+            Cancel,
+            ESC
         }
 
         private static readonly Dictionary<string, bool> _keyDownMap = new()

@@ -65,7 +65,6 @@ namespace Battle
         private IEnumerator LerpForward()
         {
             var forward = _controller.velocity.normalized;
-            SetDirOfForward(ref forward);
             while (true)
             {
                 _controller.Move(forward * Time.fixedDeltaTime * SlidPower);
