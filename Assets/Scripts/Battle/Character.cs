@@ -45,10 +45,11 @@ namespace Battle
         public event Action OnInteraction;
         public event Action OnStandup;
         internal BodyState BodyState;
-        private bool _cantAction => HasFlag(BodyState,
+        private bool _cantAction => _cantMove |
+            HasFlag(BodyState, BodyState.Attack);
+        private bool _cantMove => HasFlag(BodyState,
             BodyState.Hit |
             BodyState.Cancel |
-            BodyState.Attack |
             BodyState.Land |
             BodyState.Interaction) |
             !HasFlag(BodyState, BodyState.Grounded);
@@ -56,9 +57,7 @@ namespace Battle
 
         public Character()
         {
-            OnCalmDown += UpdateTime;
-            OnMove += (dir) => UpdateTime();
-            OnRun += (dir) => UpdateTime();
+            OnSlide += UpdateTime;
             OnJump += UpdateTime;
             OnLand += UpdateTime;
             OnAttack += UpdateTime;
@@ -76,28 +75,21 @@ namespace Battle
             if (HasFlag(BodyState, BodyState.Interaction))
             {
                 DoCancel();
-                return true;
-            }
-            else
-            if (_cantAction || HasFlag(BodyState, BodyState.Slide))
-            {
                 return false;
             }
-
-            if (HasFlag(BodyState, BodyState.Interaction))
+            else
+            if (_cantMove || HasFlag(BodyState, BodyState.Slide))
             {
-                DoCancel();
                 return false;
             }
 
             AddFlag(ref BodyState, BodyState.Walk);
-            RemoveFlag(ref BodyState, BodyState.Idle);
             OnMove?.Invoke(dir);
             return true;
         }
         public bool DoRun(Vector3 dir)
         {
-            if (_cantAction || HasFlag(BodyState, BodyState.Slide))
+            if (_cantMove || HasFlag(BodyState, BodyState.Slide))
             {
                 return false;
             }
@@ -109,7 +101,6 @@ namespace Battle
             }
 
             AddFlag(ref BodyState, BodyState.Walk);
-            RemoveFlag(ref BodyState, BodyState.Idle);
             OnRun?.Invoke(dir);
             return true;
         }
@@ -175,16 +166,17 @@ namespace Battle
         }
         public bool CalmDown()
         {
-            if (!(_cantAction || HasFlag(BodyState, BodyState.Walk)))
+            if (!_cantAction)
             {
                 return false;
             }
 
             RemoveFlag(ref BodyState, BodyState.Attack |
-                                       BodyState.Guard |
-                                       BodyState.Land |
-                                       BodyState.Cancel |
-                                       BodyState.StandUp);
+                                      BodyState.Guard |
+                                      BodyState.Land |
+                                      BodyState.Cancel |
+                                      BodyState.StandUp |
+                                      BodyState.Hit);
 
             OnCalmDown?.Invoke();
             return true;
@@ -226,36 +218,38 @@ namespace Battle
             OnCancel?.Invoke();
             return true;
         }
+        public bool DoHit()
+        {
+            AddFlag(ref BodyState, BodyState.Hit);
+            OnHit?.Invoke();
+            return true;
+        }
         public bool DoSlide()
         {
-            if (EqualsFlag(BodyState, (BodyState.Grounded | BodyState.Walk)))
+            if (EqualsFlag(BodyState, (BodyState.Grounded | BodyState.Walk | BodyState.Idle)))
             {
                 AddFlag(ref BodyState, BodyState.Slide);
-                RemoveFlag(ref BodyState, BodyState.Walk);
+                RemoveFlag(ref BodyState, BodyState.Walk | BodyState.Idle);
                 OnSlide?.Invoke();
                 return true;
             }
             return false;
         }
-
         private IEnumerator UpdateIdle()
         {
-            var duration = 3f;
+            var duration = 1.5f;
             while (true)
             {
                 yield return new WaitForFixedUpdate();
-                if (_lastUpdateTime == -1)
+                if (HasFlag(BodyState, BodyState.Idle | BodyState.Slide))
                 {
-
                 }
                 else
                 if (duration < Time.time - _lastUpdateTime)
                 {
-                    CalmDown();
                     AddFlag(ref BodyState, BodyState.Idle);
                     RemoveFlag(ref BodyState, BodyState.Walk);
                     OnIdle.Invoke();
-                    _lastUpdateTime = -1;
                 }
             }
         }

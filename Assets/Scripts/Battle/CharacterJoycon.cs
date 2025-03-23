@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Battle
 {
-    public class CharacterJoycon
+    public abstract class CharacterJoycon
     {
         private const float STAY_INPUT = 0.55f;
         private readonly Character _character;
@@ -21,16 +21,38 @@ namespace Battle
             _character.OnSlideEnd += StartCooltimeAtSliding;
             _character.OnInteraction += InvokeInteraction;
             _character.OnCancel += () => _character.DoStandUp();
+
+            SetUseMovement(out _useMovement);
+            SetUseAttack(out _useAttack);
+            SetUseJump(out _useJump);
+            SetUseSliding(out _useSliding);
+            SetUseInteraction(out _useInteraction);
+            SetUseCancel(out _useCancel);
+            SetUseLand(out _useLand);
         }
+        private bool _useMovement;
+        protected abstract void SetUseMovement(out bool useMovement);
+        private bool _useAttack;
+        protected abstract void SetUseAttack(out bool useAttack);
+        private bool _useJump;
+        protected abstract void SetUseJump(out bool useJump);
+        private bool _useSliding;
+        protected abstract void SetUseSliding(out bool useSliding);
+        private bool _useInteraction;
+        protected abstract void SetUseInteraction(out bool useInteraction);
+        private bool _useCancel;
+        protected abstract void SetUseCancel(out bool useCancel);
+        private bool _useLand;
+        protected abstract void SetUseLand(out bool useLand);
         public void UpdateInput()
         {
-            UpdateMovement();
-            UpdateAttack();
-            UpdateJump();
-            UpdateSliding();
-            UpdateInteraction();
-            UpdateCancel();
-            UpdateLand();
+            if (_useMovement) UpdateMovement();
+            if (_useAttack) UpdateAttack();
+            if (_useJump) UpdateJump();
+            if (_useSliding) UpdateSliding();
+            if (_useInteraction) UpdateInteraction();
+            if (_useCancel) UpdateCancel();
+            if (_useLand) UpdateLand();
             InvokeInput();
         }
         private void UpdateAttack()
@@ -153,5 +175,73 @@ namespace Battle
             _SlidedTime = Time.time + _cooltimeOfSlide;
         }
     }
+    public class HanZoomInJoycon : CharacterJoycon
+    {
+        public HanZoomInJoycon(Character character, CharacterController controller) : base(character, controller)
+        {
+        }
+        protected override void SetUseAttack(out bool useAttack)
+        {
+            useAttack = true;
+        }
+        protected override void SetUseCancel(out bool useCancel)
+        {
+            useCancel = true;
+        }
+        protected override void SetUseInteraction(out bool useInteraction)
+        {
+            useInteraction = false;
+        }
+        protected override void SetUseJump(out bool useJump)
+        {
+            useJump = false;
+        }
+        protected override void SetUseLand(out bool useLand)
+        {
+            useLand = true;
+        }
+        protected override void SetUseMovement(out bool useMovement)
+        {
+            useMovement = true;
+        }
+        protected override void SetUseSliding(out bool useSliding)
+        {
+            useSliding = false;
+        }
+    }
 
+    public class HanZoomOutJoycon : CharacterJoycon
+    {
+        public HanZoomOutJoycon(Character character, CharacterController controller) : base(character, controller)
+        {
+        }
+        protected override void SetUseAttack(out bool useAttack)
+        {
+            useAttack = false;
+        }
+        protected override void SetUseCancel(out bool useCancel)
+        {
+            useCancel = true;
+        }
+        protected override void SetUseInteraction(out bool useInteraction)
+        {
+            useInteraction = true;
+        }
+        protected override void SetUseJump(out bool useJump)
+        {
+            useJump = true;
+        }
+        protected override void SetUseLand(out bool useLand)
+        {
+            useLand = true;
+        }
+        protected override void SetUseMovement(out bool useMovement)
+        {
+            useMovement = true;
+        }
+        protected override void SetUseSliding(out bool useSliding)
+        {
+            useSliding = true;
+        }
+    }
 }

@@ -7,9 +7,10 @@ namespace Battle
     public class WeaponComponent : MonoBehaviour
     {
         private Weapon _weapon;
-        [SerializeField] private UnityEvent _onFire;
-        [SerializeField, Range(0, 1f)] private float _lerp;
+        [Header("Animatin")]
         [SerializeField] AnimationClip _attackClip;
+        [SerializeField, Range(0, 1f)] private float _invokeTiming;
+        [SerializeField] private UnityEvent _onFire;
 
         public void SetOwner(Character character)
         {
@@ -25,7 +26,7 @@ namespace Battle
             }
             else
             {
-                delay = _attackClip.length * _lerp;
+                delay = _attackClip.length * _invokeTiming;
             }
             StartCoroutine(DelayAttack(delay));
         }

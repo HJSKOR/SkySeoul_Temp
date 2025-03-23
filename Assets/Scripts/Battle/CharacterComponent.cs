@@ -1,115 +1,131 @@
-using System.Collections;
+using Cinemachine;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Battle
 {
     public class CharacterComponent : MonoBehaviour
     {
+        private Character _character;
+        private CharacterJoycon _usedJoycon;
+        private CharacterJoycon _zoomInJoycon;
+        private CharacterJoycon _zoomOutJoycon;
+        private CharacterAnimator _characterAnimator;
+        private CharacterAnimator _zoomInAnim;
+        private CharacterAnimator _zoomOutAnim;
+        private CharacterMovement _characterMovement;
+        private HandIK _handIK;
+        private ShootingView _view;
+        [Header("References")]
+        public bool _owner;
+        [SerializeField] private Animator _animator;
+        [SerializeField] private CharacterController _controller;
+        [Header("View")]
+        [SerializeField, Range(0, 180f)] private float _verticalRange;
+        [SerializeField, Range(0, 1000)] private float _mouseSensitivity = 500;
+        [SerializeField] private CinemachineVirtualCamera _wideCam;
+        [SerializeField] private CinemachineVirtualCamera _zoomInCam;
+        [Header("Battle")]
+        public float ArmLength;
         public float MoveSpeed = 3f;
         public float JumpPower = 5f;
         public float SlidPower = 3f;
-        private Character _character;
-        private CharacterJoycon _joycon;
-        private CharacterAnimator _characterAnimator;
-        private CharacterMovement _characterMovement;
-        private ShootingView _view;
-        private HandIK _handIK;
-        [SerializeField, Range(0, 180f)] private float _limitUp;
-        [SerializeField, Range(-180f, 0)] private float _limitDown;
-        [SerializeField, Range(0, 1000)] private float _mouseSensitivity = 500;
         [SerializeField] private WeaponComponent _weapon;
-        [SerializeField] private CharacterController _controller;
+        [SerializeField] private HitBoxComponent _hitBox;
+        [Header("Debug")]
         [SerializeField] private TextMeshProUGUI _ui;
-        [SerializeField] private Animator _animator;
-        [SerializeField] private TriggerEventHandler _groundCheck;
-        [SerializeField] private Transform _cross;
-        [SerializeField] private Transform _cam;
-        public float ArmLength;
+
         private void Awake()
         {
             _character = new();
-            _character.OnSlide += CacheLookDir;
-            _character.OnInteraction += CacheLookDir;
+
+            _zoomInAnim = new HanZoomInAnimator(_character,_animator);
+            _zoomInAnim.Unuse();
+            _zoomOutAnim = new HanZoomOutAnimator(_character,_animator);
+            _characterAnimator = _zoomOutAnim;
+
+            _hitBox.HitBox.OnCollision += (h) => _character.DoHit();
             _weapon.SetOwner(_character);
-            _joycon = new CharacterJoycon(_character, _controller);
-            _characterAnimator = new CharacterAnimator(_character, _animator);
+
+            _view = new(body: transform, _wideCam, _zoomInCam)
+            {
+                VerticalRange = _verticalRange,
+                MouseSensitivity = _mouseSensitivity
+            };
+            _view.SetActive(_owner);
+            _view.SetCamera(CamType.Wide);
+
+            if (!_owner)
+            {
+                return;
+            }
+
+            _zoomInJoycon = new HanZoomInJoycon(_character, _controller);
+            _zoomOutJoycon = new HanZoomOutJoycon(_character, _controller);
+            _usedJoycon = _zoomOutJoycon;
+            DoZoomOut();
+
             _characterMovement = new CharacterMovement(_character, _controller)
             {
                 JumpPower = JumpPower,
                 MoveSpeed = MoveSpeed,
                 SlidPower = SlidPower
             };
-            _view = new(transform)
-            {
-                LimitUp = _limitUp,
-                LimitDown = _limitDown,
-                MouseSensitivity = _mouseSensitivity
-            };
-            _handIK = new(_animator);
-            _handIK.SetWeight(1f);
-            _handIK.SetTartget(_cross);
-            var IK = _animator.AddComponent<IKEventHandler>();
-            IK.onAnimatorIK.AddListener(OnAnimatorIK);
-
-            _character.OnMove += OnDir;
-            _character.OnRun += OnDir;
         }
         private void Update()
         {
+            if (!_owner) return;
             UpdateJoycon();
             UpdateView();
-
-            if (Input.GetKeyDown(KeyCode.LeftControl))
-            {
-                _controller.transform.rotation = _animator.transform.rotation;
-                _animator.transform.localRotation = Quaternion.identity;
-                _cam.transform.localRotation = Quaternion.identity;
-            }
+            UpdateKeyLookForward();
         }
-        private Coroutine _dirCoroutine;
-        private Vector3 _pre;
-        private void OnDir(Vector3 dir)
+        private void UpdateKeyLookForward()
         {
-            if (_pre == dir)
+            if (!Input.GetKeyDown(KeyCode.LeftControl))
             {
                 return;
             }
-            if (_dirCoroutine != null)
-            {
-                StopCoroutine(_dirCoroutine);
-            }
-            _dirCoroutine = StartCoroutine(DurationDir(dir));
-            _pre = dir;
-        }
-        private IEnumerator DurationDir(Vector3 dir)
-        {
-            var @base = _controller.transform;
-            dir = @base.forward * dir.z + @base.right * dir.x;
-            dir.y = 0;
-            dir = dir.normalized;
-            var duration = 0.5f;
-            var forward = _animator.transform.forward;
-            var t = 0f;
-            while (t < 1)
-            {
-                t = Mathf.Clamp01(t + Time.deltaTime / duration);
-                _animator.transform.forward = Vector3.Lerp(forward, dir, t);
-                yield return null;
-            }
+            _controller.transform.rotation = _animator.transform.rotation;
+            _animator.transform.localRotation = Quaternion.identity;
         }
         private void FixedUpdate()
         {
-            _characterMovement.UpdateGravity();
             _ui.text = _character.BodyState.ToString();
+
+            if (!_owner) return;
+            _characterMovement.UpdateGravity();
+            UpdateZoomIn();
         }
-        private void OnAnimatorIK(int layerIndex)
+        private void UpdateJoycon()
         {
-            if (_animator.GetCurrentAnimatorStateInfo(_animator.GetLayerIndex("Upper Boddy")).shortNameHash == Animator.StringToHash("Attack"))
-            {
-                _handIK.OnAnimatorIK(layerIndex);
-            }
+            _usedJoycon?.UpdateInput();
+        }
+        private void UpdateView()
+        {
+            if (FlagHelper.HasFlag(_character.BodyState, BodyState.Jump)) return;
+            _view.UpdateView();
+        }
+        private void UpdateZoomIn()
+        {
+            if (_view.CamType is not CamType.Zoom && Input.GetKey(KeyCode.Mouse1)) DoZoomIn();
+            else
+            if (_view.CamType is CamType.Zoom && !Input.GetKey(KeyCode.Mouse1)) DoZoomOut();
+        }
+        private void DoZoomOut()
+        {
+            _view.SetCamera(CamType.Wide);
+            _usedJoycon = _zoomOutJoycon;
+            _characterAnimator.Unuse();
+            _characterAnimator = _zoomOutAnim;
+            _characterAnimator.Use();
+        }
+        private void DoZoomIn()
+        {
+            _view.SetCamera(CamType.Zoom);
+            _usedJoycon = _zoomInJoycon;
+            _characterAnimator.Unuse();
+            _characterAnimator = _zoomInAnim;
+            _characterAnimator.Use();
         }
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
@@ -122,8 +138,7 @@ namespace Battle
             }
             if (_view != null)
             {
-                _view.LimitUp = _limitUp;
-                _view.LimitDown = _limitDown;
+                _view.VerticalRange = _verticalRange;
                 _view.MouseSensitivity = _mouseSensitivity;
             }
             if (_handIK != null)
@@ -132,18 +147,5 @@ namespace Battle
             }
         }
 #endif
-        private void UpdateJoycon()
-        {
-            _joycon.UpdateInput();
-        }
-        private Vector3 _lockLookDir;
-        private void CacheLookDir()
-        {
-            _lockLookDir = _animator.transform.eulerAngles;
-        }
-        private void UpdateView()
-        {
-            _view.UpdateView();
-        }
     }
 }
