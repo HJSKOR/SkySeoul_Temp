@@ -4,16 +4,14 @@ namespace Battle
 {
     public class HanZoomInAnimator : CharacterAnimator
     {
+        private Vector3 _preDir;
+
         public HanZoomInAnimator(Character character, Animator animator) : base(character, animator)
         {
         }
         private void DoCalmDown()
         {
             _character.CalmDown();
-        }
-        private void DoStandUp()
-        {
-            _character.DoStandUp();
         }
         protected override void OnAttack()
         {
@@ -56,7 +54,7 @@ namespace Battle
         {
             SetTrigger(STATE_MOVE, 0);
             SetFloat(_stringToHash[PARAMETERS_SPEED], 0.5f);
-            SetFloat(_stringToHash[PARAMETERS_SPEED], 0f,1f);
+            SetFloat(_stringToHash[PARAMETERS_SPEED], 0f, 1f);
             UpdateDirection(dir);
         }
         protected override void OnRun(Vector3 dir)
@@ -77,21 +75,25 @@ namespace Battle
             SetBoolean(PARAMETERS_INTERACTION, false);
             SetBoolean(PARAMETERS_CROUCH, false);
         }
-        private Vector3 _preDir;
         private void UpdateDirection(Vector3 dir)
         {
+            dir.y = 0f;
+            dir.z = dir.z != 0 ? dir.z : Mathf.Abs(dir.x);
             if (_preDir == dir)
             {
                 return;
             }
 
-            SetFloat(_stringToHash[PARAMETERS_HORIZONTAL], dir.x, 0.5f);
-            SetFloat(_stringToHash[PARAMETERS_VERTICAL], dir.z, 0.5f);
+            SetFloat(_stringToHash[PARAMETERS_VERTICAL], dir.z);
             _preDir = dir;
         }
         protected override void OnUse()
         {
-            _animator.Play(STATE_ATTACK);
+            _animator.Play(STATE_ATTACK, 1);
+        }
+        protected override void OnUnuse()
+        {
+            SetFloat(_stringToHash[PARAMETERS_SPEED], 0);
         }
     }
 }

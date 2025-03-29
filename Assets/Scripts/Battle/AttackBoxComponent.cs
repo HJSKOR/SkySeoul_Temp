@@ -20,6 +20,7 @@ public class AttackBoxComponent : MonoBehaviour
             return _attackBox;
         }
     }
+
     public static AttackBoxComponent AddComponent(GameObject obj, AttackBox attackBox)
     {
         var component = obj.AddComponent<AttackBoxComponent>();
@@ -27,12 +28,10 @@ public class AttackBoxComponent : MonoBehaviour
         component._attackBox = attackBox;
         return component;
     }
-
     public void OpenAttackWindow()
     {
         AttackBox.OpenAttackWindow();
     }
-
     private AttackBox CreateAttackBox()
     {
         var hitBox = new AttackBox(_actor, _attackWindow);
@@ -40,10 +39,13 @@ public class AttackBoxComponent : MonoBehaviour
         hitBox.SetType(_boxType);
         return hitBox;
     }
-
     protected virtual void OnTriggerStay(Collider other)
     {
-        AttackBox.CheckCollision(other);
+        if (!other.TryGetComponent<IHitBox>(out var victim))
+        {
+            return;
+        }
+        AttackBox.CheckCollision(new HitBoxCollision() { Attacker = _attackBox, Victim = victim.HitBox, HitPoint = other.transform.position });
     }
     protected virtual void FixedUpdate() { }
     protected virtual void Awake() { }

@@ -39,13 +39,13 @@ namespace Battle
         {
             _character = new();
 
-            _zoomInAnim = new HanZoomInAnimator(_character,_animator);
-            _zoomInAnim.Unuse();
-            _zoomOutAnim = new HanZoomOutAnimator(_character,_animator);
+            _zoomInAnim = new HanZoomInAnimator(_character, _animator);
+            _zoomOutAnim = new HanZoomOutAnimator(_character, _animator);
             _characterAnimator = _zoomOutAnim;
+            _characterAnimator.Use();
 
             _hitBox.HitBox.OnCollision += (h) => _character.DoHit();
-            _weapon.SetOwner(_character);
+            _weapon.SetOwner(_character, actor: transform);
 
             _view = new(body: transform, _wideCam, _zoomInCam)
             {
@@ -53,7 +53,6 @@ namespace Battle
                 MouseSensitivity = _mouseSensitivity
             };
             _view.SetActive(_owner);
-            _view.SetCamera(CamType.Wide);
 
             if (!_owner)
             {
@@ -63,7 +62,6 @@ namespace Battle
             _zoomInJoycon = new HanZoomInJoycon(_character, _controller);
             _zoomOutJoycon = new HanZoomOutJoycon(_character, _controller);
             _usedJoycon = _zoomOutJoycon;
-            DoZoomOut();
 
             _characterMovement = new CharacterMovement(_character, _controller)
             {
@@ -71,13 +69,15 @@ namespace Battle
                 MoveSpeed = MoveSpeed,
                 SlidPower = SlidPower
             };
+
+            DoZoomOut();
         }
-        private void Update()
+        private void LateUpdate()
         {
             if (!_owner) return;
             UpdateJoycon();
+            UpdateZoomIn();
             UpdateView();
-            UpdateKeyLookForward();
         }
         private void UpdateKeyLookForward()
         {
@@ -90,11 +90,10 @@ namespace Battle
         }
         private void FixedUpdate()
         {
-            _ui.text = _character.BodyState.ToString();
+            _ui?.SetText(_character.BodyState.ToString());
 
             if (!_owner) return;
             _characterMovement.UpdateGravity();
-            UpdateZoomIn();
         }
         private void UpdateJoycon()
         {

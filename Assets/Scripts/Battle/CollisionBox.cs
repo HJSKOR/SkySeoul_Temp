@@ -15,19 +15,14 @@ namespace Battle
         {
             Actor = actor;
         }
-        protected static void InvokeCollision(CollisionBox attack, CollisionBox hit)
+        protected static void InvokeCollision(HitBoxCollision collision)
         {
-            var collsion = new HitBoxCollision()
-            {
-                Attacker = attack.Actor,
-                Victim = hit.Actor,
-            };
-            attack.InvokeEvent(collsion);
-            hit.InvokeEvent(collsion);
+            collision.Attacker.InvokeEvent(collision);
+            collision.Victim.InvokeEvent(collision);
         }
         private void InvokeEvent(HitBoxCollision collision)
         {
-            OnCollision.Invoke(collision);
+            OnCollision?.Invoke(collision);
         }
     }
 

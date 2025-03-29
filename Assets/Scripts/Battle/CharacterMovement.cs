@@ -6,7 +6,7 @@ namespace Battle
 {
     public class CharacterMovement
     {
-        public float MoveSpeed = 3f;
+        public float MoveSpeed = 2f;
         public float JumpPower = 5f;
         public float SlidPower = 1f;
         private readonly Character _character;

@@ -37,6 +37,5 @@ namespace Util
             pool.Clear();
             _particles.Remove(key);
         }
-
     }
 }
