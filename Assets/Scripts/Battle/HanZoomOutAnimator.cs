@@ -62,7 +62,7 @@ namespace Battle
         {
             SetTrigger(STATE_MOVE, 0);
             SetFloat(_stringToHash[PARAMETERS_SPEED], 0.5f);
-            SetFloat(_stringToHash[PARAMETERS_SPEED], 0,1f);
+            SetFloat(_stringToHash[PARAMETERS_SPEED], 0, 1f);
             UpdateDirection(dir);
         }
         protected override void OnRun(Vector3 dir)
@@ -94,14 +94,18 @@ namespace Battle
                 return;
             }
 
-            SetFloat(_stringToHash[PARAMETERS_HORIZONTAL], dir.x, 0.5f);
-            SetFloat(_stringToHash[PARAMETERS_VERTICAL], dir.z, 0.5f);
+            SetFloat(_stringToHash[PARAMETERS_HORIZONTAL], dir.x);
+            SetFloat(_stringToHash[PARAMETERS_VERTICAL], dir.z);
             _preDir = dir;
         }
 
         protected override void OnUse()
         {
-            _animator.Play(STATE_IDLE);
+            _animator.Play(STATE_IDLE, 1);
+        }
+        protected override void OnUnuse()
+        {
+            SetFloat(_stringToHash[PARAMETERS_SPEED], 0);
         }
     }
 }

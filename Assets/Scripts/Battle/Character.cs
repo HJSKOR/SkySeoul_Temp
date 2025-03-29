@@ -249,7 +249,7 @@ namespace Battle
                 {
                     AddFlag(ref BodyState, BodyState.Idle);
                     RemoveFlag(ref BodyState, BodyState.Walk);
-                    OnIdle.Invoke();
+                    OnIdle?.Invoke();
                 }
             }
         }

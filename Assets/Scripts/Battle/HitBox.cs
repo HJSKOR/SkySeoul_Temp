@@ -5,8 +5,9 @@ namespace Battle
 {
     public struct HitBoxCollision
     {
-        public Transform Victim;
-        public Transform Attacker;
+        public HitBox Victim;
+        public AttackBox Attacker;
+        public Vector3 HitPoint;
     }
 
     public interface IHitBox

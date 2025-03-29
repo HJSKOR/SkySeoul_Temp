@@ -53,7 +53,7 @@ namespace Battle
             _currentView.gameObject.SetActive(true);
             _baseFocus = _currentView.Follow?.transform.localPosition ?? Vector3.zero;
             _follow = _currentView.Follow;
-            _follow.SetParent(null);
+            _follow.parent = null;
         }
         public void LockMouse()
         {
@@ -71,7 +71,7 @@ namespace Battle
             if (_follow == null) return;
             float mouseY = Input.mousePosition.y / Screen.height - 0.5f;
             mouseY *= VerticalRange;
-            var position = _body.transform.position +  _baseFocus;
+            var position = _body.transform.position + _baseFocus;
             position.y = _baseFocus.y + -mouseY;
             _follow.position = position;
             _follow.rotation = _body.transform.rotation;

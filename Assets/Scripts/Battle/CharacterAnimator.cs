@@ -39,21 +39,6 @@ namespace Battle
             _character = character;
             _animator = animator;
 
-            _character.OnIdle += OnIdle;
-            _character.OnMove += OnMove;
-            _character.OnRun += OnRun;
-            _character.OnAttack += OnAttack;
-            _character.OnJump += OnJump;
-            _character.OnFall += OnFall;
-            _character.OnLand += OnLand;
-            _character.OnSlide += OnSlide;
-            _character.OnSlideEnd += OnSlideEnd;
-            _character.OnStandup += OnStandUp;
-            _character.OnCancel += OnCancel;
-            _character.OnInteraction += OnInteraction;
-            _character.OnCalmDown += OnCalmDown;
-            _character.OnHit += OnHit;
-
             _stringToHash.Add(STATE_IDLE, Animator.StringToHash(STATE_IDLE));
             _stringToHash.Add(STATE_MOVE, Animator.StringToHash(STATE_MOVE));
             _stringToHash.Add(STATE_ATTACK, Animator.StringToHash(STATE_ATTACK));
@@ -65,46 +50,23 @@ namespace Battle
             _stringToHash.Add(STATE_SLIDING, Animator.StringToHash(STATE_SLIDING));
             _stringToHash.Add(PARAMETERS_VERTICAL, Animator.StringToHash(PARAMETERS_VERTICAL));
             _stringToHash.Add(PARAMETERS_HORIZONTAL, Animator.StringToHash(PARAMETERS_HORIZONTAL));
-            _stringToHash.Add(PARAMETERS_SPEED, Animator.StringToHash(PARAMETERS_SPEED));   
+            _stringToHash.Add(PARAMETERS_SPEED, Animator.StringToHash(PARAMETERS_SPEED));
             _hashToString.AddRange(_stringToHash.ToDictionary(kv => kv.Value, kv => kv.Key));
         }
+        
         public void Use()
         {
-            Unuse();
-            _character.OnIdle += OnIdle;
-            _character.OnMove += OnMove;
-            _character.OnRun += OnRun;
-            _character.OnAttack += OnAttack;
-            _character.OnJump += OnJump;
-            _character.OnFall += OnFall;
-            _character.OnLand += OnLand;
-            _character.OnSlide += OnSlide;
-            _character.OnSlideEnd += OnSlideEnd;
-            _character.OnStandup += OnStandUp;
-            _character.OnCancel += OnCancel;
-            _character.OnInteraction += OnInteraction;
-            _character.OnCalmDown += OnCalmDown;
-            _character.OnHit += OnHit;
+            RemoveCharacterEvent();
+            AddCharacterEvnet();
             OnUse();
         }
         public void Unuse()
         {
-            _character.OnIdle -= OnIdle;
-            _character.OnMove -= OnMove;
-            _character.OnRun -= OnRun;
-            _character.OnAttack -= OnAttack;
-            _character.OnJump -= OnJump;
-            _character.OnFall -= OnFall;
-            _character.OnLand -= OnLand;
-            _character.OnSlide -= OnSlide;
-            _character.OnSlideEnd -= OnSlideEnd;
-            _character.OnStandup += OnStandUp;
-            _character.OnCancel -= OnCancel;
-            _character.OnInteraction -= OnInteraction;
-            _character.OnCalmDown -= OnCalmDown;
-            _character.OnHit -= OnHit;
+            RemoveCharacterEvent();
+            OnUnuse();
         }
         protected abstract void OnUse();
+        protected abstract void OnUnuse();
         protected abstract void OnIdle();
         protected abstract void OnMove(Vector3 dir);
         protected abstract void OnRun(Vector3 dir);
@@ -180,6 +142,40 @@ namespace Battle
                 _lerps.Add(parameter, value);
             }
             return value;
+        }
+        private void AddCharacterEvnet()
+        {
+            _character.OnIdle += OnIdle;
+            _character.OnMove += OnMove;
+            _character.OnRun += OnRun;
+            _character.OnAttack += OnAttack;
+            _character.OnJump += OnJump;
+            _character.OnFall += OnFall;
+            _character.OnLand += OnLand;
+            _character.OnSlide += OnSlide;
+            _character.OnSlideEnd += OnSlideEnd;
+            _character.OnStandup += OnStandUp;
+            _character.OnCancel += OnCancel;
+            _character.OnInteraction += OnInteraction;
+            _character.OnCalmDown += OnCalmDown;
+            _character.OnHit += OnHit;
+        }
+        private void RemoveCharacterEvent()
+        {
+            _character.OnIdle -= OnIdle;
+            _character.OnMove -= OnMove;
+            _character.OnRun -= OnRun;
+            _character.OnAttack -= OnAttack;
+            _character.OnJump -= OnJump;
+            _character.OnFall -= OnFall;
+            _character.OnLand -= OnLand;
+            _character.OnSlide -= OnSlide;
+            _character.OnSlideEnd -= OnSlideEnd;
+            _character.OnStandup -= OnStandUp;
+            _character.OnCancel -= OnCancel;
+            _character.OnInteraction -= OnInteraction;
+            _character.OnCalmDown -= OnCalmDown;
+            _character.OnHit -= OnHit;
         }
     }
 }
