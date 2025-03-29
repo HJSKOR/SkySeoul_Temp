@@ -84,6 +84,9 @@ Assets/01. 작업.meta
 /Assets/01. 작업
 /Assets/0.1 작업
 Assets/0.1 작업.meta
+
+Assets/Models/Props/Factory/Dummy/SM_MERGED_footholder.FBX
+
 Assets/Animation/FightingAnimsetPro/Models/Maskman/Materials/Head_D.tga
 Assets/Animation/FightingAnimsetPro/Models/Maskman/Materials/Head_D.tga.meta
 Assets/Animation/FightingAnimsetPro/Models/Maskman/Materials/Head_N.tga
@@ -114,3 +117,4 @@ Assets/Animation/FightingAnimsetPro/Models/Maskman/Materials/Eye_Blue_D.tga
 Assets/Animation/FightingAnimsetPro/Models/Maskman/Materials/Eye_Blue_D.tga.meta
 Assets/Animation/FightingAnimsetPro/Models/Maskman/Materials/Eye_Blue_S.tga
 Assets/Animation/FightingAnimsetPro/Models/Maskman/Materials/Eye_Blue_S.tga.meta
+
