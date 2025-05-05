@@ -1,7 +1,8 @@
 # SkySeoul_Temp
  
 # 팀 목표
->04월 : 목탑 내부 진입 #<a href="">진행중</a>   
+>05월 : 목탑 외부 전투 #<a href="">진행중</a>   
+>04월 : 목탑 내부 진입 #<a href="https://youtu.be/sc_0mrtyrn4">완료</a>   
 
 ### ※ 참여 인원
 |이름|파트|
