@@ -393,7 +393,10 @@ namespace Microlight.MicroBar
         {
             if(bar.RenderType == RenderType.Image)
             {
-                bar.UIPrimaryBar.fillAmount = bar.ParentBar.HPPercent;
+                // bar.UIPrimaryBar.fillAmount = bar.ParentBar.HPPercent;
+                var newScale = bar.UIPrimaryBar.rectTransform.localScale;
+                newScale.x = bar.ParentBar.HPPercent;
+                bar.UIPrimaryBar.rectTransform.localScale = newScale;
             }
             else if(bar.RenderType == RenderType.Sprite)
             {
@@ -406,7 +409,10 @@ namespace Microlight.MicroBar
         {
             if(bar.RenderType == RenderType.Image)
             {
-                bar.UIGhostBar.fillAmount = bar.ParentBar.HPPercent;
+                //bar.UIGhostBar.fillAmount = bar.ParentBar.HPPercent;
+                var newScale = bar.UIGhostBar.rectTransform.localScale;
+                newScale.x = bar.ParentBar.HPPercent;
+                bar.UIGhostBar.rectTransform.localScale = newScale;
             }
             else if(bar.RenderType == RenderType.Sprite)
             {
