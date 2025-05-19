@@ -98,6 +98,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49daf16dcbdd5134987417faa7e2be4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxDistance: 100
+  _attackClip: {fileID: 0}
+  _invokeTiming: 0
   _onFire:
     m_PersistentCalls:
       m_Calls:
@@ -125,8 +128,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  _lerp: 0
-  _attackClip: {fileID: 0}
+  _attackEffect: {fileID: 0}
 --- !u!1 &7488231629218667201
 GameObject:
   m_ObjectHideFlags: 0

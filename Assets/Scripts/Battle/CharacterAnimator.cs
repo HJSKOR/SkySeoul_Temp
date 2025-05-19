@@ -53,7 +53,7 @@ namespace Battle
             _stringToHash.Add(PARAMETERS_SPEED, Animator.StringToHash(PARAMETERS_SPEED));
             _hashToString.AddRange(_stringToHash.ToDictionary(kv => kv.Value, kv => kv.Key));
         }
-        
+
         public void Use()
         {
             RemoveCharacterEvent();

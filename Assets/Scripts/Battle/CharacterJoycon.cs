@@ -4,7 +4,12 @@ using UnityEngine;
 
 namespace Battle
 {
-    public abstract class CharacterJoycon
+    public interface IController
+    {
+        public void UpdateInput();
+    }
+
+    public abstract class CharacterJoycon : IController
     {
         private const float STAY_INPUT = 0.55f;
         private readonly Character _character;

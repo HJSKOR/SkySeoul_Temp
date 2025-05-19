@@ -8,7 +8,7 @@ namespace Battle
     {
         public float MoveSpeed = 2f;
         public float JumpPower = 5f;
-        public float SlidPower = 1f;
+        public float SlidePower = 1f;
         private readonly Character _character;
         private readonly CharacterController _controller;
         private Coroutine _slidingCoroutine;
@@ -67,7 +67,7 @@ namespace Battle
             var forward = _controller.velocity.normalized;
             while (true)
             {
-                _controller.Move(forward * Time.fixedDeltaTime * SlidPower);
+                _controller.Move(forward * Time.fixedDeltaTime * SlidePower);
                 yield return new WaitForFixedUpdate();
             }
         }

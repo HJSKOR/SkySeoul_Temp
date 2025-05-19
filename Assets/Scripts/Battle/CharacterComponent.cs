@@ -1,148 +1,91 @@
-using Cinemachine;
 using TMPro;
 using UnityEngine;
 
 namespace Battle
 {
-    public class CharacterComponent : MonoBehaviour
+    public abstract class CharacterComponent : MonoBehaviour
     {
-        private Character _character;
-        private CharacterJoycon _usedJoycon;
-        private CharacterJoycon _zoomInJoycon;
-        private CharacterJoycon _zoomOutJoycon;
-        private CharacterAnimator _characterAnimator;
-        private CharacterAnimator _zoomInAnim;
-        private CharacterAnimator _zoomOutAnim;
-        private CharacterMovement _characterMovement;
-        private HandIK _handIK;
-        private ShootingView _view;
-        [Header("References")]
-        public bool _owner;
-        [SerializeField] private Animator _animator;
-        [SerializeField] private CharacterController _controller;
-        [Header("View")]
-        [SerializeField, Range(0, 180f)] private float _verticalRange;
-        [SerializeField, Range(0, 1000)] private float _mouseSensitivity = 500;
-        [SerializeField] private CinemachineVirtualCamera _wideCam;
-        [SerializeField] private CinemachineVirtualCamera _zoomInCam;
+        protected Character character { get; private set; }
+        private IController joycon;
+        private CharacterAnimator characterAnimator;
+        private CharacterMovement characterMovement;
+        [field: SerializeField] protected Animator animator { get; private set; }
+        [field: SerializeField] protected CharacterController characterController { get; private set; }
         [Header("Battle")]
         public float ArmLength;
         public float MoveSpeed = 3f;
         public float JumpPower = 5f;
-        public float SlidPower = 3f;
-        [SerializeField] private WeaponComponent _weapon;
-        [SerializeField] private HitBoxComponent _hitBox;
+        public float SlidePower = 3f;
+        [SerializeField] private WeaponComponent weapon;
+        [SerializeField] private HitBoxComponent hitBox;
         [Header("Debug")]
-        [SerializeField] private TextMeshProUGUI _ui;
+        [SerializeField] private TextMeshProUGUI ui;
 
+        protected abstract void OnUpdate();
+        protected abstract void OnLateUpdate();
+        protected abstract void OnFixedUpdate();
+        protected abstract void OnAwake();
+        protected abstract void GetAnimatorFromFrame(out CharacterAnimator animator);
+        protected abstract void GetJoyconFromFrame(out IController newJoycon);
+        protected abstract void GetMovementFromFrame(out CharacterMovement newMovement);
+        protected abstract void OnHit(HitBoxCollision collision);
         private void Awake()
         {
-            _character = new();
-
-            _zoomInAnim = new HanZoomInAnimator(_character, _animator);
-            _zoomOutAnim = new HanZoomOutAnimator(_character, _animator);
-            _characterAnimator = _zoomOutAnim;
-            _characterAnimator.Use();
-
-            _hitBox.HitBox.OnCollision += (h) => _character.DoHit();
-            _weapon.SetOwner(_character, actor: transform);
-
-            _view = new(body: transform, _wideCam, _zoomInCam)
-            {
-                VerticalRange = _verticalRange,
-                MouseSensitivity = _mouseSensitivity
-            };
-            _view.SetActive(_owner);
-
-            if (!_owner)
-            {
-                return;
-            }
-
-            _zoomInJoycon = new HanZoomInJoycon(_character, _controller);
-            _zoomOutJoycon = new HanZoomOutJoycon(_character, _controller);
-            _usedJoycon = _zoomOutJoycon;
-
-            _characterMovement = new CharacterMovement(_character, _controller)
-            {
-                JumpPower = JumpPower,
-                MoveSpeed = MoveSpeed,
-                SlidPower = SlidPower
-            };
-
-            DoZoomOut();
+            character = new();
+            hitBox.HitBox.OnCollision += (h) => character.DoHit();
+            hitBox.HitBox.OnCollision += OnHit;
+            weapon?.SetOwner(character, actor: transform);
+            OnAwake();
+        }
+        private void Update()
+        {
+            GetAnimatorFromFrame(out var currentAnimator);
+            ChangeAnimator(currentAnimator);
+            GetJoyconFromFrame(out var currentJoycon);
+            ChangeJoycon(currentJoycon);
+            GetMovementFromFrame(out var currentMovement);
+            ChangeMovement(currentMovement);
+            OnUpdate();
         }
         private void LateUpdate()
         {
-            if (!_owner) return;
-            UpdateJoycon();
-            UpdateZoomIn();
-            UpdateView();
-        }
-        private void UpdateKeyLookForward()
-        {
-            if (!Input.GetKeyDown(KeyCode.LeftControl))
-            {
-                return;
-            }
-            _controller.transform.rotation = _animator.transform.rotation;
-            _animator.transform.localRotation = Quaternion.identity;
+            OnLateUpdate();
         }
         private void FixedUpdate()
         {
-            _ui?.SetText(_character.BodyState.ToString());
-
-            if (!_owner) return;
-            _characterMovement.UpdateGravity();
+            ui?.SetText(character.BodyState.ToString());
+            characterMovement?.UpdateGravity();
+            UpdateJoycon();
+            OnFixedUpdate();
         }
         private void UpdateJoycon()
         {
-            _usedJoycon?.UpdateInput();
+            joycon?.UpdateInput();
         }
-        private void UpdateView()
+        private void ChangeAnimator(CharacterAnimator newAnimator)
         {
-            if (FlagHelper.HasFlag(_character.BodyState, BodyState.Jump)) return;
-            _view.UpdateView();
+            if (newAnimator == characterAnimator) return;
+            characterAnimator?.Unuse();
+            characterAnimator = newAnimator;
+            characterAnimator.Use();
         }
-        private void UpdateZoomIn()
+        private void ChangeJoycon(IController joycon)
         {
-            if (_view.CamType is not CamType.Zoom && Input.GetKey(KeyCode.Mouse1)) DoZoomIn();
-            else
-            if (_view.CamType is CamType.Zoom && !Input.GetKey(KeyCode.Mouse1)) DoZoomOut();
+            this.joycon = joycon;
         }
-        private void DoZoomOut()
+        private void ChangeMovement(CharacterMovement movement)
         {
-            _view.SetCamera(CamType.Wide);
-            _usedJoycon = _zoomOutJoycon;
-            _characterAnimator.Unuse();
-            _characterAnimator = _zoomOutAnim;
-            _characterAnimator.Use();
-        }
-        private void DoZoomIn()
-        {
-            _view.SetCamera(CamType.Zoom);
-            _usedJoycon = _zoomInJoycon;
-            _characterAnimator.Unuse();
-            _characterAnimator = _zoomInAnim;
-            _characterAnimator.Use();
+            if (movement == characterMovement) return;
+            characterMovement = movement;
         }
 #if UNITY_EDITOR
-        private void OnDrawGizmosSelected()
+        protected virtual void OnDrawGizmosSelected()
         {
-            if (_characterMovement != null)
+            if (characterMovement != null)
             {
-                _characterMovement.SlidPower = SlidPower;
-                _characterMovement.JumpPower = JumpPower;
-                _characterMovement.MoveSpeed = MoveSpeed;
-            }
-            if (_view != null)
-            {
-                _view.VerticalRange = _verticalRange;
-                _view.MouseSensitivity = _mouseSensitivity;
-            }
-            if (_handIK != null)
-            {
-                _handIK.ARM_LENGTH = ArmLength;
+                characterMovement.SlidePower = SlidePower;
+                characterMovement.JumpPower = JumpPower;
+                characterMovement.MoveSpeed = MoveSpeed;
             }
         }
 #endif

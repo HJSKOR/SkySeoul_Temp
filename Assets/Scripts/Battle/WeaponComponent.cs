@@ -7,6 +7,7 @@ namespace Battle
 {
     public class WeaponComponent : MonoBehaviour
     {
+        public float maxDistance;
         private Weapon _weapon;
         private Bullet _bullet;
         [Header("Animation")]
@@ -54,6 +55,10 @@ namespace Battle
         {
             yield return new WaitForSeconds(1f);
             action.Invoke();
+        }
+        private void Update()
+        {
+            _bullet.MaxDistance= maxDistance;
         }
     }
 }
