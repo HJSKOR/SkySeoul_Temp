@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.1506022022.field_editor_tool": {
+      "version": "https://github.com/1506022022/FieldEditorTool.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.ai.navigation": "1.1.1"
+      },
+      "hash": "be8f0f8ef71d06be1d492ed77375ba01777b5457"
+    },
     "com.autodesk.fbx": {
       "version": "5.1.1",
       "depth": 0,

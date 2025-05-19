@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.1506022022.field_editor_tool": "https://github.com/1506022022/FieldEditorTool.git",
     "com.autodesk.fbx": "5.1.1",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.ai.navigation": "2.0.6",
