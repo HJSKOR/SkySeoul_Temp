@@ -911,7 +911,7 @@ AnimatorController:
   - serializedVersion: 5
     m_Name: Upper Boddy
     m_StateMachine: {fileID: -3188034709296300376}
-    m_Mask: {fileID: 101100000, guid: 5087c83980ae1fd4ea5c8ce09d73bf66, type: 2}
+    m_Mask: {fileID: 31900000, guid: 1e39e958aa4f1184187f4e14fd865c4e, type: 2}
     m_Motions: []
     m_Behaviours: []
     m_BlendingMode: 0
@@ -1263,7 +1263,8 @@ BlendTree:
     m_DirectBlendParameter: Speed
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: 1ef433339d92f304dbf4bbf5b6f1ef9a, type: 2}
+    m_Motion: {fileID: -203655887218126122, guid: 5390c5ac8ca2d5d4399eed5a88b64d97,
+      type: 3}
     m_Threshold: 0.2857143
     m_Position: {x: 0, y: 1}
     m_TimeScale: 1
@@ -1491,7 +1492,8 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 96d7f2d6b65fffe4db63d71975036d9f, type: 2}
+  m_Motion: {fileID: -203655887218126122, guid: 0d5ba68cef9e96c45bcbdb098a54940a,
+    type: 3}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 

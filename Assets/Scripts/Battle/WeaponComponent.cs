@@ -8,57 +8,44 @@ namespace Battle
     public class WeaponComponent : MonoBehaviour
     {
         public float maxDistance;
-        private Weapon _weapon;
-        private Bullet _bullet;
+        private Weapon weapon;
+        private Bullet bullet;
+        private AttackData attackData;
         [Header("Animation")]
-        [SerializeField] AnimationClip _attackClip;
-        [SerializeField, Range(0, 1f)] private float _invokeTiming;
-        [SerializeField] private UnityEvent _onFire;
-
+        [SerializeField] private UnityEvent onFire;
         [Header("Effect")]
-        [SerializeField] ParticleSystem _attackEffect;
+        [SerializeField] ParticleSystem attackEffect;
 
         public void SetOwner(Character character, Transform actor)
         {
-            _weapon = new Weapon(character);
-            _weapon.OnFire += DoAttack;
-            _bullet = new Bullet(gun: transform, actor);
-            _onFire.AddListener(_bullet.OnFire);
-            _bullet.OnHit += OnHit;
+            weapon = new Weapon(character);
+            weapon.OnFire += DoAttack;
+            bullet = new Bullet(gun: transform, actor);
+            onFire.AddListener(bullet.OnFire);
+            bullet.OnHit += OnHit;
         }
         private void DoAttack()
         {
-            var delay = 0f;
-            if (_attackClip == null)
-            {
-                delay = 0;
-            }
-            else
-            {
-                delay = _attackClip.length * _invokeTiming;
-            }
-            StartCoroutine(DelayAttack(delay));
+            StartCoroutine(DelayAction(onFire.Invoke, attackData.PreDelay));
         }
-        private IEnumerator DelayAttack(float delay)
-        {
-            yield return new WaitForSeconds(delay);
-            _onFire.Invoke();
-        }
+
         private void OnHit(HitBoxCollision collision)
         {
-            var particle = ParticlePlayer.GetPool(_attackEffect).Get();
+            if (attackEffect == null) return;
+            var particle = ParticlePlayer.GetPool(attackEffect).Get();
             particle.transform.position = collision.HitPoint;
             particle.Play();
-            StartCoroutine(DelayRelease(() => ParticlePlayer.GetPool(_attackEffect).Release(particle)));
+            StartCoroutine(DelayAction(() => ParticlePlayer.GetPool(attackEffect).Release(particle), attackEffect.totalTime));
+
         }
-        private IEnumerator DelayRelease(UnityAction action)
+        private IEnumerator DelayAction(UnityAction action, float delay)
         {
-            yield return new WaitForSeconds(1f);
-            action.Invoke();
+            yield return new WaitForSeconds(delay);
+            action?.Invoke();
         }
         private void Update()
         {
-            _bullet.MaxDistance= maxDistance;
+            bullet.MaxDistance = maxDistance;
         }
     }
 }
