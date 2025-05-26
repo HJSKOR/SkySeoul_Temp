@@ -14,13 +14,13 @@ namespace Battle
     public class CharacterMovement : IMovement
     {
         public float MoveSpeed = 2f;
-        public float JumpPower = 5f;
+        public float JumpPower = 4f;
         public float SlidePower = 1f;
         private readonly Character character;
         private readonly CharacterController controller;
         private Coroutine slidingCoroutine;
 
-        public bool IsGrounded => controller?.isGrounded??true;
+        public bool IsGrounded => controller?.isGrounded ?? true;
 
         public CharacterMovement(Character character, Transform transform)
         {
@@ -57,7 +57,7 @@ namespace Battle
         }
         private void DoJump()
         {
-            controller.SimpleMove(Vector3.up * JumpPower);
+            controller.Move(Vector3.up * JumpPower);
         }
         public void UpdateGravity()
         {

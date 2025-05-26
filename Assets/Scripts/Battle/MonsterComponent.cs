@@ -16,8 +16,8 @@ namespace Battle
         readonly NavMeshAgent agent;
         readonly Character character;
 
-        public float speed=3;
-        public bool IsGrounded => agent?.isOnNavMesh??true;
+        public float speed = 3;
+        public bool IsGrounded => agent?.isOnNavMesh ?? true;
 
         public MonsterMovement(Character character, Transform transform)
         {
@@ -46,17 +46,13 @@ namespace Battle
     public class MonsterComponent : CharacterComponent
     {
         private Henchmen _henchmen;
-        [SerializeField] private Team Team = Team.Monster;
 
-        protected override void Awake()
-        {
-            base.Awake();
-        }
         public override void Initialize()
         {
             base.Initialize();
             _henchmen = new(this);
             SetController(_henchmen);
+            _henchmen.Team = Team.Monster;
         }
         protected override void Update()
         {

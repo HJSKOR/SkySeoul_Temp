@@ -52,23 +52,18 @@ namespace Battle
         protected override void GetGoToList(in FieldBase<byte> field, out List<Vector2Int> Index)
         {
             Index = new List<Vector2Int>();
-            for (byte i = 0; i < field.Height * 2 + 1; i++)
+
+            var player = GameObject.FindAnyObjectByType<ZoomCharacterComponent>();
+            if (player != null)
             {
-                for (byte j = 0; j < field.Height * 2 + 1; j++)
-                {
-                    if (field.Array[i + j] == (byte)Team.Player)
-                    {
-                        Index.Add(new Vector2Int(j, i));
-                    }
-                }
+                var playerIndex = ConvertToInedx(player.transform.position, field);
+                Index.Add(playerIndex);
+                return;
             }
 
-            if (Index.Count == 0)
-            {
-                Index.Add(new Vector2Int(0, 0));
-                Index.Add(new Vector2Int(field.Height, field.Height));
-                Index.Add(new Vector2Int(field.Height * 2, field.Height * 2));
-            }
+            Index.Add(new Vector2Int(0, 0));
+            Index.Add(new Vector2Int(field.Height, field.Height));
+            Index.Add(new Vector2Int(field.Height * 2, field.Height * 2));
         }
 
         protected override void CalculateNextPosition(in FieldBase<byte> field, in List<Vector2Int> goTo, Vector2Int currentIndex, out Vector2Int nextIndex)

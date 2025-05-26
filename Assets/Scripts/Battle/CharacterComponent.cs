@@ -36,6 +36,7 @@ namespace Battle
 
 
             hitBox.HitBox.OnCollision += Hit;
+
             weapon?.SetOwner(character, actor: transform);
 
             if (GetType() == typeof(ZoomCharacterComponent))

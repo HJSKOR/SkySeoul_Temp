@@ -15,10 +15,8 @@ namespace Battle
         {
             var me = currentIndex;
             var list = goTo.OrderBy(x => Vector2Int.Distance(x, me));
-            foreach (var item in list)
+            foreach (var pos in list)
             {
-                var pos = item;
-
                 foreach (var intt in DIRS)
                 {
                     if (IsOutOfRange(pos + intt, field.Height))
@@ -34,7 +32,7 @@ namespace Battle
                     }
 
                     var temp = new Vector2Int(nextX, nextY);
-                    if (temp == item)
+                    if (temp == pos)
                     {
                         nextIndex = currentIndex;
                         return;

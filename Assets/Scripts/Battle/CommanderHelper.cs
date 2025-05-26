@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.Rendering.DebugUI;
 namespace Battle
 {
     public static class CommanderHelper
@@ -34,9 +32,9 @@ namespace Battle
                 index.y < 0;
         }
 
-        public static Vector2Int ConvertToInedx<T>(Henchmen henchmen, FieldBase<T> field)
+        public static Vector2Int ConvertToInedx<T>(Vector3 position, FieldBase<T> field)
         {
-            Vector2Int index = new((int)(henchmen.Position.x - field.Pivot.x), (int)(henchmen.Position.z - field.Pivot.z));
+            Vector2Int index = new((int)(position.x - field.Pivot.x), (int)(position.z - field.Pivot.z));
             return index;
         }
 
