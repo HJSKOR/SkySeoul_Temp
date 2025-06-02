@@ -601,7 +601,7 @@ GameObject:
   - component: {fileID: 444518472419135348}
   - component: {fileID: 3434934882248754478}
   m_Layer: 0
-  m_Name: gameStartSelecter
+  m_Name: gameStart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1822,7 +1822,7 @@ GameObject:
   - component: {fileID: 764208534067263808}
   - component: {fileID: 4279045823066274914}
   m_Layer: 0
-  m_Name: playerableCharacterSelecter
+  m_Name: playerableCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2011,7 +2011,7 @@ PrefabInstance:
     - target: {fileID: 3795197906649309515, guid: 76155aa66ebd0de47a4f431730452aad,
         type: 3}
       propertyPath: m_Name
-      value: playMapSelecter
+      value: playMap
       objectReference: {fileID: 0}
     - target: {fileID: 3795197906649309515, guid: 76155aa66ebd0de47a4f431730452aad,
         type: 3}

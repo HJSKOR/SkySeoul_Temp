@@ -4,12 +4,20 @@ namespace TopDown
 {
     public class GameManagerComponent : MonoBehaviour
     {
-        private ModeSet modeSet;
-        private IGameMode gameMode;
-        private ILoadManager loadManager;
-        [SerializeField] private MapType OnPlayMode = MapType.Lobby;
+        void Awake()
+        {
+            var play = GmaeManager.Start;
+        }
+    }
 
-        private bool IsNull(object item, string name)
+    public static class GmaeManager
+    {
+        public static bool Start { get; }
+        static ModeSet modeSet;
+        static IGameMode gameMode;
+        static MapType PlayMode = MapType.Lobby;
+
+        static bool IsNull(object item, string name)
         {
             if (item == null)
             {
@@ -18,47 +26,35 @@ namespace TopDown
             }
             return item == null;
         }
-        private void Awake()
+        static GmaeManager()
         {
-            InitioalizeModeSet();
+            InitializeModeSet();
             SetGameMode();
         }
-        private void InitioalizeModeSet()
+        static void InitializeModeSet()
         {
             modeSet = Resources.Load<ModeSet>(nameof(ModeSet));
             if (IsNull(modeSet, nameof(modeSet))) return;
-            modeSet.MapType = OnPlayMode;
+            modeSet.MapType = PlayMode;
         }
-        private void SetGameMode()
+        static void SetGameMode()
         {
             if (IsNull(modeSet, nameof(modeSet))) return;
             gameMode = GameModeFactory.CreateMode(modeSet.MapType);
 
             if (IsNull(gameMode, nameof(gameMode))) return;
             gameMode.OnQuit += OnExitGameMode;
-
-            loadManager = UIManagerFactory.CreateUIManager(modeSet.MapType);
-            if (IsNull(loadManager, nameof(loadManager))) return;
-            loadManager.Load();
-            loadManager.OnLoaded += OnLoaded;
+            gameMode.Load(modeSet);
         }
-        private void OnLoaded()
-        {
-            loadManager.OnLoaded -= OnLoaded;
-
-            if (IsNull(gameMode, nameof(gameMode))) return;
-            gameMode.Initialize(modeSet);
-        }
-        private void ClearGameMode()
+        static void ClearGameMode()
         {
             gameMode.OnQuit -= OnExitGameMode;
             gameMode = null;
         }
-        private void UnloadResource()
+        static void UnloadResource()
         {
-            loadManager.Unload();
         }
-        private void OnExitGameMode()
+        static void OnExitGameMode()
         {
             UnloadResource();
             ClearGameMode();

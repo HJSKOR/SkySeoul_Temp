@@ -43,7 +43,7 @@ namespace Battle
         }
     }
 
-    public class MonsterComponent : CharacterComponent
+    public class MonsterComponent : CharacterComponent, IMonster
     {
         private Henchmen _henchmen;
 
