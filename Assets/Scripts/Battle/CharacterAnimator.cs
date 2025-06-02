@@ -137,11 +137,13 @@ namespace Battle
         }
         bool IsSame(int exitState, int layer)
         {
+            if (animator == null) return true;
             var state = animator.GetCurrentAnimatorStateInfo(layer);
             return state.shortNameHash == exitState;
         }
         bool IsExit(int exitState, int layer)
         {
+            if (animator == null) return true;
             var state = animator.GetCurrentAnimatorStateInfo(layer);
             var outState = state.shortNameHash != exitState;
             var outRange = 1 <= state.normalizedTime;

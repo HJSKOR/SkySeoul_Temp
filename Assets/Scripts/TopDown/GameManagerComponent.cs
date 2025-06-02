@@ -6,16 +6,15 @@ namespace TopDown
     {
         void Awake()
         {
-            var play = GmaeManager.Start;
+            var play = GameManager.Start;
         }
     }
 
-    public static class GmaeManager
+    public static class GameManager
     {
         public static bool Start { get; }
         static ModeSet modeSet;
         static IGameMode gameMode;
-        static MapType PlayMode = MapType.Lobby;
 
         static bool IsNull(object item, string name)
         {
@@ -26,7 +25,7 @@ namespace TopDown
             }
             return item == null;
         }
-        static GmaeManager()
+        static GameManager()
         {
             InitializeModeSet();
             SetGameMode();
@@ -35,7 +34,6 @@ namespace TopDown
         {
             modeSet = Resources.Load<ModeSet>(nameof(ModeSet));
             if (IsNull(modeSet, nameof(modeSet))) return;
-            modeSet.MapType = PlayMode;
         }
         static void SetGameMode()
         {
@@ -43,8 +41,8 @@ namespace TopDown
             gameMode = GameModeFactory.CreateMode(modeSet.MapType);
 
             if (IsNull(gameMode, nameof(gameMode))) return;
-            gameMode.OnQuit += OnExitGameMode;
             gameMode.Load(modeSet);
+            gameMode.OnQuit += OnExitGameMode;
         }
         static void ClearGameMode()
         {

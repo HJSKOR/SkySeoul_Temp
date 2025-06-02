@@ -69,6 +69,7 @@ namespace TopDown
         }
         void OnFailure()
         {
+            loadingInfo.text = $"{loader.Locator} failed.";
             CallbackFailureLoad?.Invoke();
         }
     }

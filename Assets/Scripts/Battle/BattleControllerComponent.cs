@@ -17,7 +17,7 @@ namespace Battle
             var characters = FindObjectsByType<CharacterComponent>(FindObjectsSortMode.InstanceID);
             for (int i = 0; i < characters.Length; i++)
             {
-                BattleController.AddCharacter(characters[i]);
+                BattleController.JoinCharacter(characters[i]);
             }
         }
     }

@@ -25,18 +25,14 @@ namespace TopDown
             list.Add(Loader<GameObject, ParticleSystem>.GetLoader(nameof(ParticleSystem)));
             loader.Initialize(list);
             loader.Load();
-            SetQuitEvent();
             InitModeSet(set);
             InitSelecters();
         }
         void OnQuitMode()
         {
-            LoaderFactory.Unload();
             loader?.Unload();
-        }
-        void SetQuitEvent()
-        {
-            OnQuit += OnQuitMode;
+            LoaderFactory.Unload();
+            OnQuit?.Invoke();
         }
         void InitModeSet(ModeSet set)
         {
@@ -53,7 +49,7 @@ namespace TopDown
 
             if (playerableCharacter is null || playMap is null || gameStart is null)
             {
-                OnQuit?.Invoke();
+                OnQuitMode();
                 return;
             }
 
@@ -72,7 +68,7 @@ namespace TopDown
         }
         void OnSelectGameStart(ISelect selecter)
         {
-            OnQuit?.Invoke();
+            OnQuitMode();
         }
 
     }
