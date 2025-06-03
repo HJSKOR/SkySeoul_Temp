@@ -5,89 +5,179 @@ namespace Battle
 {
     public abstract class CharacterComponent : MonoBehaviour
     {
-        protected Character character { get; private set; }
-        private IController joycon;
-        private CharacterAnimator characterAnimator;
-        private CharacterMovement characterMovement;
-        [field: SerializeField] protected Animator animator { get; private set; }
-        [field: SerializeField] protected CharacterController characterController { get; private set; }
+        Character character;
+        IController controller;
+        public bool IsGrounded => characterMovement.IsGrounded;
+        CharacterAnimator characterAnimator;
+        IMovement characterMovement;
+        internal BodyState State => character.BodyState;
+        [SerializeField] Animator animator;
         [Header("Battle")]
-        public float ArmLength;
         public float MoveSpeed = 3f;
         public float JumpPower = 5f;
         public float SlidePower = 3f;
-        [SerializeField] private WeaponComponent weapon;
-        [SerializeField] private HitBoxComponent hitBox;
+        [SerializeField] WeaponComponent weapon;
+        [field: SerializeField] public HitBoxComponent Body { get; private set; }
         [Header("Debug")]
-        [SerializeField] private TextMeshProUGUI ui;
+        [SerializeField] TextMeshProUGUI ui;
+        public readonly Statistics HP = new(10);
 
-        protected abstract void OnUpdate();
-        protected abstract void OnLateUpdate();
-        protected abstract void OnFixedUpdate();
-        protected abstract void OnAwake();
-        protected abstract void GetAnimatorFromFrame(out CharacterAnimator animator);
-        protected abstract void GetJoyconFromFrame(out IController newJoycon);
-        protected abstract void GetMovementFromFrame(out CharacterMovement newMovement);
-        protected abstract void OnHit(HitBoxCollision collision);
-        private void Awake()
+        public virtual void Initialize()
         {
             character = new();
-            hitBox.HitBox.OnCollision += (h) => character.DoHit();
-            hitBox.HitBox.OnCollision += OnHit;
+            character.OnAttack += OnAttack;
+            character.OnMove += OnMove;
+            character.OnRun += OnRun;
+            character.OnJump += OnJump;
+            character.OnLand += OnLand;
+            character.OnHit += OnHit;
+            character.OnCancel += OnCancel;
+            character.OnInteraction += OnInteraction;
+            character.OnSlide += OnSlide;
+            character.OnDead += OnDie;
+
             weapon?.SetOwner(character, actor: transform);
-            OnAwake();
+
+            if (GetType() == typeof(ZoomCharacterComponent))
+            {
+                SetAnimator(new HanZoomOutAnimator());
+                SetController(new HanZoomOutJoycon(this));
+                SetMovement(new CharacterMovement(character, transform));
+            }
+            else if (GetType() == typeof(MonsterComponent))
+            {
+                SetAnimator(new ZombieAnimator());
+                SetMovement(new MonsterMovement(character, transform));
+            }
+            else
+            {
+                SetAnimator(new EmptyAnimator());
+                SetController(new EmptyJoycon());
+                SetMovement(new EmptyMovement());
+            }
         }
-        private void Update()
+        public void SetAnimator(CharacterAnimator characterAnimator)
         {
-            GetAnimatorFromFrame(out var currentAnimator);
-            ChangeAnimator(currentAnimator);
-            GetJoyconFromFrame(out var currentJoycon);
-            ChangeJoycon(currentJoycon);
-            GetMovementFromFrame(out var currentMovement);
-            ChangeMovement(currentMovement);
-            OnUpdate();
+            if (characterAnimator == this.characterAnimator) return;
+            this.characterAnimator?.Unuse();
+            this.characterAnimator = characterAnimator;
+            this.characterAnimator.Initialize(character, animator);
+            this.characterAnimator.Use();
         }
-        private void LateUpdate()
+        public void SetController(IController controller)
         {
-            OnLateUpdate();
+            this.controller = controller;
         }
-        private void FixedUpdate()
-        {
-            ui?.SetText(character.BodyState.ToString());
-            characterMovement?.UpdateGravity();
-            UpdateJoycon();
-            OnFixedUpdate();
-        }
-        private void UpdateJoycon()
-        {
-            joycon?.UpdateInput();
-        }
-        private void ChangeAnimator(CharacterAnimator newAnimator)
-        {
-            if (newAnimator == characterAnimator) return;
-            characterAnimator?.Unuse();
-            characterAnimator = newAnimator;
-            characterAnimator.Use();
-        }
-        private void ChangeJoycon(IController joycon)
-        {
-            this.joycon = joycon;
-        }
-        private void ChangeMovement(CharacterMovement movement)
+        public void SetMovement(IMovement movement)
         {
             if (movement == characterMovement) return;
             characterMovement = movement;
         }
+        public void DoAttack()
+        {
+            character.DoAttack();
+        }
+        protected virtual void OnAttack()
+        {
+
+        }
+        public void DoDie()
+        {
+            character.DoDie();
+        }
+        protected virtual void OnDie()
+        {
+        }
+        public void DoHit()
+        {
+            character.DoHit();
+        }
+        protected virtual void OnHit()
+        {
+        }
+        public void DoInteraction()
+        {
+            character.DoInteraction();
+        }
+        protected virtual void OnInteraction()
+        {
+            if (InteractionSystem.TryGetInteraction(transform, out var interaction))
+            {
+                interaction.DoStart();
+            }
+        }
+        public void DoMove(Vector3 position)
+        {
+            character.DoMove(position);
+        }
+        protected virtual void OnMove(Vector3 position)
+        {
+
+        }
+        public void DoRun(Vector3 position)
+        {
+            character.DoRun(position);
+        }
+        protected virtual void OnRun(Vector3 position)
+        {
+
+        }
+        public void DoSlide()
+        {
+            character.DoSlide();
+        }
+        protected virtual void OnSlide()
+        {
+        }
+        public void DoJump()
+        {
+            character.DoJump();
+        }
+        protected virtual void OnJump()
+        {
+        }
+        public void DoLand()
+        {
+            character.DoLand();
+        }
+        protected virtual void OnLand()
+        {
+        }
+        public void DoCancel()
+        {
+            character.DoCancel();
+        }
+        protected virtual void OnCancel()
+        {
+
+        }
+        protected virtual void Awake()
+        {
+            Initialize();
+        }
+        protected virtual void Update()
+        {
+            controller?.Update();
+        }
+        protected virtual void FixedUpdate()
+        {
+            characterMovement.UpdateGravity();
+            ui?.SetText(character.BodyState.ToString());
+        }
 #if UNITY_EDITOR
         protected virtual void OnDrawGizmosSelected()
         {
-            if (characterMovement != null)
+            if (characterMovement is CharacterMovement move)
             {
-                characterMovement.SlidePower = SlidePower;
-                characterMovement.JumpPower = JumpPower;
-                characterMovement.MoveSpeed = MoveSpeed;
+                move.SlidePower = SlidePower;
+                move.JumpPower = JumpPower;
+                move.MoveSpeed = MoveSpeed;
             }
         }
 #endif
+        protected virtual void OnDestroy()
+        {
+            characterAnimator?.Unuse();
+        }
     }
 }

@@ -10,23 +10,26 @@ namespace Battle
     {
         None = 0,
         Walk = 1 << 0,
-        Grounded = 1 << 1,
-        Crouch = 1 << 2,
-        Weapon = 1 << 3,
-        Hit = 1 << 4,
-        Attack = 1 << 5,
-        Guard = 1 << 6,
-        Down = 1 << 7,
-        Interaction = 1 << 8,
-        Cancel = 1 << 9,
-        Land = 1 << 10,
-        Idle = 1 << 11,
-        Slide = 1 << 12,
-        Jump = 1 << 13,
-        StandUp = 1 << 14
+        Run = 1 << 1,
+        Grounded = 1 << 2,
+        Crouch = 1 << 3,
+        Weapon = 1 << 4,
+        Hit = 1 << 5,
+        Attack = 1 << 6,
+        Guard = 1 << 7,
+        Down = 1 << 8,
+        Interaction = 1 << 9,
+        Cancel = 1 << 10,
+        Land = 1 << 11,
+        Idle = 1 << 12,
+        Slide = 1 << 13,
+        Jump = 1 << 14,
+        StandUp = 1 << 15,
+        Die = 1 << 16
     }
     public class Character
     {
+        public event Action OnEntry;
         public event Action OnIdle;
         public event Action OnCalmDown;
         public event Action<Vector3> OnMove;
@@ -44,11 +47,13 @@ namespace Battle
         public event Action OnSlideEnd;
         public event Action OnInteraction;
         public event Action OnStandup;
+        public event Action OnDead;
         internal BodyState BodyState;
         private bool _cantAction => _cantMove |
             HasFlag(BodyState, BodyState.Attack);
         private bool _cantMove => HasFlag(BodyState,
             BodyState.Hit |
+            BodyState.Die |
             BodyState.Cancel |
             BodyState.Land |
             BodyState.Interaction) |
@@ -146,7 +151,6 @@ namespace Battle
             {
                 return false;
             }
-
             AddFlag(ref BodyState, BodyState.Attack);
             RemoveFlag(ref BodyState, BodyState.Idle);
             OnAttack?.Invoke();
@@ -170,7 +174,6 @@ namespace Battle
             {
                 return false;
             }
-
             RemoveFlag(ref BodyState, BodyState.Attack |
                                       BodyState.Guard |
                                       BodyState.Land |
@@ -220,6 +223,7 @@ namespace Battle
         }
         public bool DoHit()
         {
+            if (HasFlag(BodyState, BodyState.Die)) return false;
             AddFlag(ref BodyState, BodyState.Hit);
             OnHit?.Invoke();
             return true;
@@ -234,6 +238,12 @@ namespace Battle
                 return true;
             }
             return false;
+        }
+        public void DoDie()
+        {
+            if (HasFlag(BodyState, BodyState.Die)) return;
+            AddFlag(ref BodyState, BodyState.Die);
+            OnDead?.Invoke();
         }
         private IEnumerator UpdateIdle()
         {

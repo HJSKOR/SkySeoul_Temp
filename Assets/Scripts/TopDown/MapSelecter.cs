@@ -8,11 +8,11 @@ using UnityEngine.Events;
 
 namespace TopDown
 {
-    public class MapSelecter : MonoBehaviour, ISelectManager
+    public class MapSelecter : MonoBehaviour, ISelect
     {
         public MapView MapViewPrefab;
         public uint SelectedValue { get; private set; }
-        public event Action<ISelectManager> OnSelect;
+        public event Action<ISelect> OnSelect;
         public UnityEvent OnFocusEvent;
         public UnityEvent OffFocusEvent;
         public Vector2 margin;

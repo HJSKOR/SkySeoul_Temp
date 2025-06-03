@@ -7,6 +7,11 @@ using UnityEngine.Events;
 
 namespace Battle
 {
+    public class EmptyAnimator : CharacterAnimator
+    {
+
+    }
+
     public abstract class CharacterAnimator
     {
         protected const string STATE_ATTACK = "Attack";
@@ -19,25 +24,45 @@ namespace Battle
         protected const string STATE_FALL = "Fall";
         protected const string STATE_SLIDING = "Sliding";
         protected const string STATE_CROUCH = "Crouch";
+        protected const string STATE_DIE = "Die";
         protected const string PARAMETERS_CALMDOWN = "CalmDown";
         protected const string PARAMETERS_SPEED = "Speed";
         protected const string PARAMETERS_CROUCH = "Crouch";
         protected const string PARAMETERS_INTERACTION = "Interaction";
         protected const string PARAMETERS_HORIZONTAL = "Horizontal";
         protected const string PARAMETERS_VERTICAL = "Vertical";
-        protected readonly Animator _animator;
-        protected readonly Character _character;
+        protected Animator animator;
+        protected Character character;
         protected readonly Dictionary<string, int> _stringToHash = new();
         protected readonly Dictionary<int, string> _hashToString = new();
         private readonly Dictionary<int, Lerp> _lerps = new();
         private readonly Dictionary<int, Coroutine> _awaits = new();
         private string _preTrigger = STATE_IDLE;
         private static readonly CoroutineRunner _runner = CoroutineRunner.instance;
-
-        public CharacterAnimator(Character character, Animator animator)
+        protected virtual void OnUse() { }
+        protected virtual void OnUnuse() { }
+        protected virtual void OnIdle() { }
+        protected virtual void OnMove(Vector3 dir) { }
+        protected virtual void OnRun(Vector3 dir) { }
+        protected virtual void OnAttack() { }
+        protected virtual void OnJump() { }
+        protected virtual void OnFall() { }
+        protected virtual void OnLand() { }
+        protected virtual void OnSlide() { }
+        protected virtual void OnSlideEnd() { }
+        protected virtual void OnStandUp() { }
+        protected virtual void OnCancel() { }
+        protected virtual void OnInteraction() { }
+        protected virtual void OnCalmDown() { }
+        protected virtual void OnHit() { }
+        protected virtual void OnDie()
         {
-            _character = character;
-            _animator = animator;
+        
+        }
+        public void Initialize(Character character, Animator animator)
+        {
+            this.character = character;
+            this.animator = animator;
 
             _stringToHash.Add(STATE_IDLE, Animator.StringToHash(STATE_IDLE));
             _stringToHash.Add(STATE_MOVE, Animator.StringToHash(STATE_MOVE));
@@ -48,12 +73,12 @@ namespace Battle
             _stringToHash.Add(STATE_CANCEL, Animator.StringToHash(STATE_CANCEL));
             _stringToHash.Add(STATE_FALL, Animator.StringToHash(STATE_FALL));
             _stringToHash.Add(STATE_SLIDING, Animator.StringToHash(STATE_SLIDING));
+            _stringToHash.Add(STATE_DIE, Animator.StringToHash(STATE_DIE));
             _stringToHash.Add(PARAMETERS_VERTICAL, Animator.StringToHash(PARAMETERS_VERTICAL));
             _stringToHash.Add(PARAMETERS_HORIZONTAL, Animator.StringToHash(PARAMETERS_HORIZONTAL));
             _stringToHash.Add(PARAMETERS_SPEED, Animator.StringToHash(PARAMETERS_SPEED));
             _hashToString.AddRange(_stringToHash.ToDictionary(kv => kv.Value, kv => kv.Key));
         }
-
         public void Use()
         {
             RemoveCharacterEvent();
@@ -65,22 +90,11 @@ namespace Battle
             RemoveCharacterEvent();
             OnUnuse();
         }
-        protected abstract void OnUse();
-        protected abstract void OnUnuse();
-        protected abstract void OnIdle();
-        protected abstract void OnMove(Vector3 dir);
-        protected abstract void OnRun(Vector3 dir);
-        protected abstract void OnAttack();
-        protected abstract void OnJump();
-        protected abstract void OnFall();
-        protected abstract void OnLand();
-        protected abstract void OnSlide();
-        protected abstract void OnSlideEnd();
-        protected abstract void OnStandUp();
-        protected abstract void OnCancel();
-        protected abstract void OnInteraction();
-        protected abstract void OnCalmDown();
-        protected abstract void OnHit();
+
+        protected void Play(string name)
+        {
+            animator.Play(name);
+        }
         protected void SetFloat(int parameter, float value, float duration = 0f)
         {
             GetLerp(parameter).SetDuration(duration)
@@ -88,23 +102,23 @@ namespace Battle
         }
         protected void SetTrigger(string trigger, int layer)
         {
-            var stateInfo = _animator.GetCurrentAnimatorStateInfo(layer);
+            var stateInfo = animator.GetCurrentAnimatorStateInfo(layer);
             var state = stateInfo.shortNameHash;
             var loop = stateInfo.loop;
             if (!loop && _preTrigger == trigger && state == _stringToHash[trigger])
             {
-                _animator.Play(state, layer, 0f);
+                animator.Play(state, layer, 0f);
             }
             else
             {
-                _animator.ResetTrigger(_preTrigger);
-                _animator.SetTrigger(trigger);
+                animator.ResetTrigger(_preTrigger);
+                animator.SetTrigger(trigger);
             }
             _preTrigger = trigger;
         }
         protected void SetBoolean(string boolean, bool value)
         {
-            _animator.SetBool(boolean, value);
+            animator.SetBool(boolean, value);
         }
         protected void AwaitExitEvent(string exitState, int layer, UnityAction exitEvent)
         {
@@ -115,67 +129,71 @@ namespace Battle
 
             _awaits[_stringToHash[exitState]] = _runner.StartCoroutine(InvokeEixitEvent(_stringToHash[exitState], layer, exitEvent));
         }
-        private IEnumerator InvokeEixitEvent(int exitState, int layer, UnityAction exitEvent)
+        IEnumerator InvokeEixitEvent(int exitState, int layer, UnityAction exitEvent)
         {
             yield return new WaitUntil(() => IsSame(exitState, layer));
             yield return new WaitUntil(() => IsExit(exitState, layer));
             exitEvent?.Invoke();
         }
-        private bool IsSame(int exitState, int layer)
+        bool IsSame(int exitState, int layer)
         {
-            var state = _animator.GetCurrentAnimatorStateInfo(layer);
+            if (animator == null) return true;
+            var state = animator.GetCurrentAnimatorStateInfo(layer);
             return state.shortNameHash == exitState;
         }
-        private bool IsExit(int exitState, int layer)
+        bool IsExit(int exitState, int layer)
         {
-            var state = _animator.GetCurrentAnimatorStateInfo(layer);
+            if (animator == null) return true;
+            var state = animator.GetCurrentAnimatorStateInfo(layer);
             var outState = state.shortNameHash != exitState;
             var outRange = 1 <= state.normalizedTime;
             return outState || outRange;
         }
-        private Lerp GetLerp(int parameter)
+        Lerp GetLerp(int parameter)
         {
             if (!_lerps.TryGetValue(parameter, out var value))
             {
                 value = new Lerp();
-                value.SetAnimator(_animator);
+                value.SetAnimator(animator);
                 _lerps.Add(parameter, value);
             }
             return value;
         }
-        private void AddCharacterEvnet()
+        void AddCharacterEvnet()
         {
-            _character.OnIdle += OnIdle;
-            _character.OnMove += OnMove;
-            _character.OnRun += OnRun;
-            _character.OnAttack += OnAttack;
-            _character.OnJump += OnJump;
-            _character.OnFall += OnFall;
-            _character.OnLand += OnLand;
-            _character.OnSlide += OnSlide;
-            _character.OnSlideEnd += OnSlideEnd;
-            _character.OnStandup += OnStandUp;
-            _character.OnCancel += OnCancel;
-            _character.OnInteraction += OnInteraction;
-            _character.OnCalmDown += OnCalmDown;
-            _character.OnHit += OnHit;
+            character.OnIdle += OnIdle;
+            character.OnMove += OnMove;
+            character.OnRun += OnRun;
+            character.OnAttack += OnAttack;
+            character.OnJump += OnJump;
+            character.OnFall += OnFall;
+            character.OnLand += OnLand;
+            character.OnSlide += OnSlide;
+            character.OnSlideEnd += OnSlideEnd;
+            character.OnStandup += OnStandUp;
+            character.OnCancel += OnCancel;
+            character.OnInteraction += OnInteraction;
+            character.OnCalmDown += OnCalmDown;
+            character.OnHit += OnHit;
+            character.OnDead += OnDie;
         }
-        private void RemoveCharacterEvent()
+        void RemoveCharacterEvent()
         {
-            _character.OnIdle -= OnIdle;
-            _character.OnMove -= OnMove;
-            _character.OnRun -= OnRun;
-            _character.OnAttack -= OnAttack;
-            _character.OnJump -= OnJump;
-            _character.OnFall -= OnFall;
-            _character.OnLand -= OnLand;
-            _character.OnSlide -= OnSlide;
-            _character.OnSlideEnd -= OnSlideEnd;
-            _character.OnStandup -= OnStandUp;
-            _character.OnCancel -= OnCancel;
-            _character.OnInteraction -= OnInteraction;
-            _character.OnCalmDown -= OnCalmDown;
-            _character.OnHit -= OnHit;
+            character.OnIdle -= OnIdle;
+            character.OnMove -= OnMove;
+            character.OnRun -= OnRun;
+            character.OnAttack -= OnAttack;
+            character.OnJump -= OnJump;
+            character.OnFall -= OnFall;
+            character.OnLand -= OnLand;
+            character.OnSlide -= OnSlide;
+            character.OnSlideEnd -= OnSlideEnd;
+            character.OnStandup -= OnStandUp;
+            character.OnCancel -= OnCancel;
+            character.OnInteraction -= OnInteraction;
+            character.OnCalmDown -= OnCalmDown;
+            character.OnHit -= OnHit;
+            character.OnDead -= OnDie;
         }
     }
 }

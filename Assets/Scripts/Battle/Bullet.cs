@@ -4,7 +4,11 @@ using Util;
 
 namespace Battle
 {
-    public class Bullet
+    public interface IBullet
+    {
+        public void OnFire();
+    }
+    public class Bullet : IBullet
     {
         private readonly AttackBox _attackBox;
         private readonly Transform _gun;
@@ -37,12 +41,12 @@ namespace Battle
 
             _attackBox.CheckCollision(new HitBoxCollision() { Attacker = _attackBox, Victim = victim.HitBox, HitPoint = hit.point });
         }
-        private void DrawHitLine(HitBoxCollision collision)
+        void DrawHitLine(HitBoxCollision collision)
         {
             var ray = GetAim();
             Debug.DrawRay(ray.origin, collision.HitPoint - ray.origin, Color.red, 1f);
         }
-        private void DrawBulletLine()
+        void DrawBulletLine()
         {
             var ray = GetAim();
             Debug.DrawRay(ray.origin, ray.direction, Color.yellow, 1f);
