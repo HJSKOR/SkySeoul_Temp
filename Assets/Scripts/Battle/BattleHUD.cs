@@ -12,7 +12,6 @@ namespace Battle
         public BattleHUD()
         {
             HUD = new GameObject("HUD").AddComponent<Canvas>();
-            GameObject.DontDestroyOnLoad(HUD);
             HUD.renderMode = RenderMode.ScreenSpaceOverlay;
 
             playerBar = GameObject.Instantiate(Resources.Load<GameObject>("Player HP Bar").GetComponent<MicroBar>());
@@ -22,10 +21,6 @@ namespace Battle
             enemyBar = GameObject.Instantiate(Resources.Load<GameObject>("Enemy HP Bar").GetComponent<MicroBar>());
             enemyBar.transform.SetParent(HUD.transform, false);
             enemyBar.Initialize(1);
-        }
-        ~BattleHUD()
-        {
-            GameObject.Destroy(HUD.gameObject);
         }
         public void UpdatePlayer(CharacterComponent character)
         {

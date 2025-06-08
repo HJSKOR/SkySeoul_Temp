@@ -157,7 +157,7 @@ namespace Battle
         }
         protected virtual void Update()
         {
-            controller?.Update();
+            controller.Update();
         }
         protected virtual void FixedUpdate()
         {
@@ -175,9 +175,5 @@ namespace Battle
             }
         }
 #endif
-        protected virtual void OnDestroy()
-        {
-            characterAnimator?.Unuse();
-        }
     }
 }

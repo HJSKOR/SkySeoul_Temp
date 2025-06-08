@@ -12,8 +12,10 @@ namespace Battle
     public class ShootingView
     {
         public CamType CamType { get; private set; }
-        public float MouseSensitivity = 1.5f;
+        public float MouseSensitivity = 500f;
         public float VerticalRange;
+        private Vector3 _baseFocus;
+        private Transform _follow;
         private readonly Transform _body;
         private readonly CinemachineVirtualCamera _wideCam;
         private readonly CinemachineVirtualCamera _zoomCam;
@@ -26,6 +28,7 @@ namespace Battle
 
             _wideCam.Priority = 10;
             _zoomCam.Priority = 11;
+            LockMouse();
             CloseAllCamera();
             SetCamera(CamType.Wide);
         }
@@ -36,6 +39,7 @@ namespace Battle
 
             if (_currentView != null)
             {
+                _currentView.Follow.localPosition = _baseFocus;
                 _currentView.gameObject.SetActive(false);
             }
 
@@ -47,7 +51,9 @@ namespace Battle
                 _ => _wideCam
             };
             _currentView.gameObject.SetActive(true);
-            _currentView.LookAt = _body;
+            _baseFocus = _currentView.Follow?.transform.localPosition ?? Vector3.zero;
+            _follow = _currentView.Follow;
+            _follow.parent = null;
         }
         public void LockMouse()
         {
@@ -57,40 +63,18 @@ namespace Battle
         {
             Cursor.lockState -= CursorLockMode.Locked;
         }
-
-        public float distance = 5.0f;
-        public float minDistance = 2.0f;
-        public float maxDistance = 10.0f;
-        public float yMinLimit = -20f;
-        public float yMaxLimit = 80f;
-        private float x = 0.0f;
-        private float y = 0.0f;
-
-        void Update()
-        {
-            x -= Input.GetAxis("Mouse X") * MouseSensitivity;
-            y -= Input.GetAxis("Mouse Y") * MouseSensitivity;
-            distance -= Input.GetAxis("Mouse ScrollWheel") * MouseSensitivity;
-            distance = Mathf.Clamp(distance, minDistance, maxDistance);
-
-            y = Mathf.Clamp(y, yMinLimit, yMaxLimit);
-            x = Mathf.Clamp(x, -360, 360);
-            float radianX = x * Mathf.Deg2Rad;
-            float radianY = (y + 3) * Mathf.Deg2Rad;
-
-            float posX = _body.position.x + distance * Mathf.Sin(radianY) * Mathf.Cos(radianX);
-            float posY = _body.position.y + distance * Mathf.Cos(radianY);
-            float posZ = _body.position.z + distance * Mathf.Sin(radianY) * Mathf.Sin(radianX);
-
-            _currentView.transform.position = new Vector3(posX, posY, posZ);
-
-            Vector3 dir = (_body.position - _currentView.transform.position).normalized;
-            dir.y = 0;
-            _body.forward = dir;
-        }
         public void UpdateView()
         {
-            Update();
+            float mouseX = Input.GetAxis("Mouse X") * MouseSensitivity * Time.deltaTime;
+            _body.Rotate(Vector3.up * mouseX);
+
+            if (_follow == null) return;
+            float mouseY = Input.mousePosition.y / Screen.height - 0.5f;
+            mouseY *= VerticalRange;
+            var position = _body.transform.position + _baseFocus;
+            position.y = _baseFocus.y + -mouseY;
+            _follow.position = position;
+            _follow.rotation = _body.transform.rotation;
         }
         public void SetActive(bool active)
         {

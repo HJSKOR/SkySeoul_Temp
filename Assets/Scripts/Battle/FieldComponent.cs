@@ -1,84 +1,68 @@
-using System.Collections.Generic;
 using UnityEngine;
 namespace Battle
 {
     public class FieldComponent : MonoBehaviour
     {
-        public float interval = 3;
-        float t = 0;
-        enum CommanderType { Near, Random, NearStop };
-        [SerializeField] private CommanderType type = CommanderType.Random;
-        public List<MonsterComponent> enemys = new();
-
-        public void Add(MonsterComponent enemy)
+        public float _interval = 3;
+        public float _t = 0;
+        private enum CommanderType { Near, Random, NearStop };
+        [SerializeField] private CommanderType type;
+        private void ChangeCommander(CommanderType type)
         {
-            enemys.Add(enemy);
-        }
-        public void Remove(MonsterComponent enemy)
-        {
-            enemys.Remove(enemy);
-            commander.FreeHenchmen(enemy.henchmen);
-        }
-
-        void ChangeCommander(CommanderType type)
-        {
-            commander?.Dispose();
-            commander = type switch
+            _commander?.Dispose();
+            _commander = type switch
             {
-                CommanderType.Near => new NearCommander(Size.x, Size.z, pivot),
-                CommanderType.Random => new RandomCommander(Size.x, Size.z, pivot),
-                CommanderType.NearStop => new NearStopCommander(Size.x, Size.z, pivot),
-                _ => new NearStopCommander(Size.x, Size.z, pivot)
+                CommanderType.Near => new NearCommander(Width,Height, pivot),
+                CommanderType.Random => new RandomCommander(Width, Height, pivot),
+                CommanderType.NearStop => new NearStopCommander(Width, Height, pivot),
+                _ => new NearCommander(Width, Height, pivot)
             };
-            for (int i = 0; i < enemys.Count; i++)
-            {
-                commander.AddHenchmen(enemys[i].henchmen);
-            }
         }
-        CommanderType _preType;
-        void Update()
+        private CommanderType _preType;
+        private void Update()
         {
             if (_preType != type)
             {
                 ChangeCommander(type);
                 _preType = type;
             }
-            t += Time.deltaTime;
-            if (interval < t)
+            _t += Time.deltaTime;
+            if (_interval < _t)
             {
-                t = 0;
+                _t = 0;
                 UpdateCommand();
             }
         }
 
-        [Min(1)] public Vector3Int Size = Vector3Int.one;
-        Commander<byte> commander;
-        float CellSize = 1f;
+        [Min(1)] public int Width = 1;
+        [Min(1)] public int Height = 1;
+        [Min(1)] public int CellSize = 1;
+        private Commander<byte> _commander;
+
         public void UpdateCommand()
         {
-            commander?.UpdateCommand();
+            _commander.UpdateCommand();
         }
         void Awake()
         {
             Initialize();
+            ChangeCommander(type);
         }
         Vector3 cell;
         Vector3 pivot;
-        public void Initialize()
+        void Initialize()
         {
             cell = (Vector3.right + Vector3.forward) * CellSize + Vector3.up * 0.2f;
             pivot = transform.position
                           + new Vector3(cell.x / 2f, cell.y / 2, cell.z / 2f);
-
-            ChangeCommander(type);
         }
         void OnDrawGizmos()
         {
             Gizmos.color = Color.yellow;
 
-            for (int z = 0; z < Size.z; z++)
+            for (int z = 0; z < Height; z++)
             {
-                for (int x = 0; x < Size.x; x++)
+                for (int x = 0; x < Width; x++)
                 {
                     Vector3 offset = new Vector3(x * CellSize, 0, z * CellSize);
                     Vector3 cellCenter = pivot + offset;

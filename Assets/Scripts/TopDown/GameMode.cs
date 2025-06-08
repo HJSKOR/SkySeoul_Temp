@@ -6,5 +6,6 @@ namespace TopDown
     {
         public void Load(ModeSet set);
         public event Action OnQuit;
+        public event Action OnLoaded;
     }
 }

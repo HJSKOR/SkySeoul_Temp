@@ -17,6 +17,14 @@ namespace Battle
         {
             this.character = character;
         }
+        public void LookForJob()
+        {
+            OnSpawnEvent?.Invoke(this);
+        }
+        public void LeaveJob()
+        {
+            OnDestroyEvent?.Invoke(this);
+        }
         Vector3 prePosition;
         Vector3 targetPosition;
         public void MoveTo(Vector3 position)

@@ -50,7 +50,6 @@ namespace TopDown
             {
                 GameObject.Destroy(obj);
             }
-            Instances.Clear();
         }
     }
     public static class ControllerManagerFactory

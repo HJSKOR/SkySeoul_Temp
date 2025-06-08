@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 0276e67675016dd4abdd335bcf390490
   m_currentHash:
     serializedVersion: 2
-    Hash: cba387847af6d23d1b3c9d6873868cf2
+    Hash: 6696066dde1a63e63848bd124da72c71
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_BundleLocalCatalog: 0
@@ -92,12 +92,6 @@ MonoBehaviour:
     - AudioClip
     - ParticleSystem
     - GameObject
-    - ILoad
-    - 0000000000
-    - IPlayable
-    - IEnemy
-    - FieldData
-    - FieldComponent
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 18a3be959fabdb54482298621204316a, type: 2}

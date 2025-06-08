@@ -1,4 +1,3 @@
-using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -44,25 +43,46 @@ namespace Battle
         }
     }
 
-    public class MonsterComponent : CharacterComponent, IEnemy
+    public class MonsterComponent : CharacterComponent, IMonster
     {
-        public Henchmen henchmen { get; private set; }
+        private Henchmen _henchmen;
 
         public override void Initialize()
         {
             base.Initialize();
-            henchmen = new(this);
-            SetController(henchmen);
-            henchmen.Team = Team.Monster;
-
-            StartCoroutine(WaitAndActiveAgent());
+            _henchmen = new(this);
+            SetController(_henchmen);
+            _henchmen.Team = Team.Monster;
         }
-
-
-        IEnumerator WaitAndActiveAgent()
+        protected override void Update()
         {
-            yield return new WaitForSeconds(1f);
-            GetComponent<NavMeshAgent>().enabled = true;
+            base.Update();
+            _henchmen.LookForJob();
         }
+        void OnDisable()
+        {
+            _henchmen?.LeaveJob();
+        }
+        //protected override void OnHit(HitBoxCollision collision)
+        //{
+        //    base.OnHit(collision);
+        //    this.StopAllCoroutines();
+        //    this.StartCoroutine(KnockbackRoutine(collision.Attacker.Actor.forward));
+        //}
+        //private IEnumerator KnockbackRoutine(Vector3 direction)
+        //{
+        //    var knockbackDuration = 1.0f;
+        //    var knockbackStrength = 10f;
+        //    float timer = 0f;
+        //    float volume = Mathf.PI * Mathf.Pow(characterController.radius, 2) * characterController.height * 2f;
+        //    Vector3 velocity = direction.normalized * knockbackStrength / volume;
+        //    while (timer < knockbackDuration)
+        //    {
+        //        characterController.Move(velocity * Time.deltaTime);
+
+        //        timer += Time.deltaTime;
+        //        yield return null;
+        //    }
+        //}
     }
 }

@@ -199,7 +199,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bar: {fileID: 3023073710899117322}
   loadingInfo: {fileID: 5526240136646196644}
-  minDuration: 3
+  minDuration: 5
 --- !u!1 &5743193703855540170
 GameObject:
   m_ObjectHideFlags: 0

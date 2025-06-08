@@ -1,6 +1,6 @@
 namespace Battle
 {
-    public interface IPlayable { }
-    public interface IEnemy { }
+    public interface IPlayer { }
+    public interface IMonster { }
 
 }

@@ -17,29 +17,10 @@ MonoBehaviour:
     m_SerializedData: []
   m_GUID: 0276e67675016dd4abdd335bcf390490
   m_SerializeEntries:
-  - m_GUID: 2b2a3c1b59d3a3940a43b47c949fc2d1
-    m_Address: "Assets/0. \uC791\uC5C5/\uC804\uD22C/2000000000.prefab"
+  - m_GUID: 6ee71472b8d8d1748866b2ecdb43a0a1
+    m_Address: Assets/UI/LobbyLoader.prefab
     m_ReadOnly: 0
-    m_SerializedLabels:
-    - IPlayable
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 6e890fd5f4ff565409741ea52f55e797
-    m_Address: "Assets/0. \uC791\uC5C5/\uC804\uD22C/2100000000.prefab"
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - IEnemy
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ec52cec67ef256d409f939a0a966620c
-    m_Address: "Assets/0. \uC791\uC5C5/\uC804\uD22C/Field.prefab"
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - FieldComponent
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: fa033f9620f2a1143b4854b769ddd548
-    m_Address: "Assets/0. \uC791\uC5C5/\uC804\uD22C/EntryPoint.prefab"
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - FieldComponent
+    m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7107e067d9f312f4998c197892b1440a, type: 2}
