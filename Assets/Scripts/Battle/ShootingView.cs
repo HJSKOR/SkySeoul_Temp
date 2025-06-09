@@ -68,13 +68,16 @@ namespace Battle
 
         void Update()
         {
-            x -= Input.GetAxis("Mouse X") * MouseSensitivity;
-            y -= Input.GetAxis("Mouse Y") * MouseSensitivity;
-            distance -= Input.GetAxis("Mouse ScrollWheel") * MouseSensitivity;
-            distance = Mathf.Clamp(distance, minDistance, maxDistance);
+            x -= Mathf.Clamp(Input.GetAxis("Mouse X"), -1, 1) * MouseSensitivity;
+            y += Mathf.Clamp(Input.GetAxis("Mouse Y"), -1, 1) * MouseSensitivity;
+            distance -= Mathf.Clamp(Input.GetAxis("Mouse ScrollWheel"), -1, 1) * MouseSensitivity;
 
+            distance = Mathf.Clamp(distance, minDistance, maxDistance);
             y = Mathf.Clamp(y, yMinLimit, yMaxLimit);
-            x = Mathf.Clamp(x, -360, 360);
+            x = Mathf.Clamp(x, -360f, 360f);
+            x = x == -360f || x == 360f ? 0f : x;
+
+            Debug.Log(x);
             float radianX = x * Mathf.Deg2Rad;
             float radianY = (y + 3) * Mathf.Deg2Rad;
 

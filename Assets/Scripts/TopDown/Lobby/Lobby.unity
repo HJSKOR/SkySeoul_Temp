@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 1323307770}
   - component: {fileID: 1323307771}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Load GmaeManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -373,5 +373,5 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1366622531}
-  - {fileID: 1323307770}
   - {fileID: 1612877641}
+  - {fileID: 1323307770}

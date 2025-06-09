@@ -1,4 +1,5 @@
 ﻿using Battle;
+using Cysharp.Threading.Tasks;
 using FieldEditorTool;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,7 @@ namespace TopDown
         void ExitMode()
         {
             battle.Clear();
+            battle = null;
             LoaderFactory.Unload();
             while (loaders.Count > 0)
             {
@@ -37,6 +39,53 @@ namespace TopDown
             }
             set.MapType = MapType.Lobby;
             OnQuit?.Invoke();
+        }
+        void OnExitField(FieldComponent field)
+        {
+            while (field.enemys.Count > 0)
+            {
+                DisposeCharacter(field.enemys[0]);
+                field.Remove(field.enemys[0]);
+            }
+        }
+        async void OnEnterField(FieldComponent field)
+        {
+            var reader = new StringReader(fieldInfos[field]);
+            var enemyDB = Loader<GameObject, CharacterComponent>.GetLoader(nameof(IEnemy));
+            reader.ReadLine();
+            string json;
+            while ((json = reader.ReadLine()) != null)
+            {
+                var type = JsonUtility.FromJson<EntityData>(json).HeaderType;
+                var instance = JsonUtility.FromJson(json, FieldEditorTool.Types.FindTypeByName<EntityData>(type));
+                if (instance is ActorData actorData)
+                {
+                    var actor = GameObject.Instantiate(enemyDB.LoadedResources[actorData.Name]);
+                    actor.transform.position = field.transform.position + actorData.Position;
+                    actor.transform.eulerAngles = actorData.Rotation;
+                    if (actor is IEnemy)
+                    {
+                        var agent = actor.GetComponent<NavMeshAgent>();
+                        field.Add((MonsterComponent)actor);
+                    }
+                    OnBirthCharacter(actor);
+                }
+                await UniTask.Yield();
+            }
+
+            current = field;
+            field.Initialize();
+        }
+        void OnBirthCharacter(CharacterComponent character)
+        {
+            character.Initialize();
+            battle.JoinCharacter(character);
+        }
+        void OnBirthEnemy(CharacterComponent enemy)
+        {
+        }
+        void OnBirthPlayableCharacter(CharacterComponent pc)
+        {
         }
         void OnDeadCharacter(CharacterComponent character)
         {
@@ -55,49 +104,12 @@ namespace TopDown
         void DisposeCharacter(CharacterComponent character)
         {
             battle.DisposeCharacter(character);
-            GameObject.Destroy(character.gameObject);
+            GameObject.Destroy(character.gameObject, 3f);
         }
-        void OnBirthCharacter(CharacterComponent character)
+        void OnLoaded()
         {
-            battle.JoinCharacter(character);
-        }
-        void OnBirthEnemy(CharacterComponent enemy)
-        {
-        }
-        void OnBirthPlayableCharacter(CharacterComponent pc)
-        {
-        }
-        void OnExitField(FieldComponent field)
-        {
-            while (field.enemys.Count > 0)
-            {
-                DisposeCharacter(field.enemys[0]);
-                field.Remove(field.enemys[0]);
-            }
-        }
-        void OnEnterField(FieldComponent field)
-        {
-            var reader = new StringReader(fieldInfos[field]);
-            var enemyDB = Loader<GameObject, CharacterComponent>.GetLoader(nameof(IEnemy));
-            reader.ReadLine();
-            string json;
-            while ((json = reader.ReadLine()) != null)
-            {
-                var type = JsonUtility.FromJson<EntityData>(json).HeaderType;
-                var instance = JsonUtility.FromJson(json, FieldEditorTool.Types.FindTypeByName<EntityData>(type));
-                if (instance is ActorData actorData)
-                {
-                    var enemy = GameObject.Instantiate(enemyDB.LoadedResources[actorData.Name]);
-                    var agent = enemy.GetComponent<NavMeshAgent>();
-                    enemy.transform.position = field.transform.position + actorData.Position;
-                    enemy.transform.eulerAngles = actorData.Rotation;
-                    field.Add((MonsterComponent)enemy);
-                    OnBirthCharacter(enemy);
-                }
-            }
-
-            current = field;
-            field.Initialize();
+            InitializeFields();
+            InitializePlayableCharacter();
         }
         public void Load(ModeSet set)
         {
@@ -114,12 +126,6 @@ namespace TopDown
             loader.Load();
             loader.OnLoaded += OnLoaded;
         }
-        void OnLoaded()
-        {
-            InitializeFields();
-            InitializePlayableCharacter();
-        }
-
         void InitializeFields()
         {
             fieldInfos.Clear();
@@ -153,9 +159,9 @@ namespace TopDown
             if (playable != null) DisposeCharacter(playable);
             var characterDB = Loader<GameObject, CharacterComponent>.GetLoader(nameof(IPlayable));
             var origin = characterDB.LoadedResources[set.PlayableCharacterID.ToString("D10")];
-            playable = GameObject.Instantiate(origin);
-            playable.transform.position = entry?.Position ?? Vector3.zero;
-            playable.transform.eulerAngles = entry?.Rotation ?? Vector3.zero;
+            var pos = entry?.Position ?? Vector3.zero;
+            var rot = entry?.Rotation ?? Vector3.zero;
+            playable = GameObject.Instantiate(origin, pos, Quaternion.Euler(rot));
             OnBirthCharacter(playable);
         }
     }
