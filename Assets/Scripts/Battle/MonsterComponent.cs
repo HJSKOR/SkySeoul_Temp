@@ -1,69 +1,68 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Battle
 {
-    public class MonsterJoycon : IController
+    public class EmptyJoycon : IController
     {
-        public MonsterJoycon(Character character, CharacterController controller)
-        {
-        }
-
-        public void UpdateInput()
+        public void Update()
         {
         }
     }
 
-    public class MonsterComponent : CharacterComponent
+    public class MonsterMovement : IMovement
     {
-        [ContextMenu("H")]
-        public void Hit()
-        {
-            character.DoHit();
-        }
-        protected override void GetAnimatorFromFrame(out CharacterAnimator animator)
-        {
-            animator = new ZombieAnimator(this.character, this.animator);
-        }
-        protected override void GetJoyconFromFrame(out IController newJoycon)
-        {
-            newJoycon = new MonsterJoycon(character, characterController);
-        }
-        protected override void GetMovementFromFrame(out CharacterMovement newMovement)
-        {
-            newMovement = new CharacterMovement(character, characterController);
-        }
-        protected override void OnAwake()
-        {
-        }
-        protected override void OnFixedUpdate()
-        {
-        }
-        protected override void OnHit(HitBoxCollision collision)
-        {
-            StopAllCoroutines();
-            StartCoroutine(KnockbackRoutine(collision.Attacker.Actor.forward));
-        }
-        protected override void OnLateUpdate()
-        {
-        }
-        protected override void OnUpdate()
-        {
-        }
-        private IEnumerator KnockbackRoutine(Vector3 direction)
-        {
-            var knockbackDuration = 1.0f;
-            var knockbackStrength = 10f;
-            float timer = 0f;
-            float volume = Mathf.PI * Mathf.Pow(characterController.radius, 2) * characterController.height * 2f;
-            Vector3 velocity = direction.normalized * knockbackStrength / volume;
-            while (timer < knockbackDuration)
-            {
-                characterController.Move(velocity * Time.deltaTime);
+        readonly NavMeshAgent agent;
+        readonly Character character;
 
-                timer += Time.deltaTime;
-                yield return null;
-            }
+        public float speed = 3;
+        public bool IsGrounded => agent?.isOnNavMesh ?? true;
+
+        public MonsterMovement(Character character, Transform transform)
+        {
+            this.character = character;
+            character.OnMove += Move;
+            character.OnRun += Run;
+            if (!transform.TryGetComponent(out agent)) agent = transform.AddComponent<NavMeshAgent>();
+        }
+
+        void Move(Vector3 position)
+        {
+            agent.SetDestination(position);
+            agent.speed = speed;
+        }
+        void Run(Vector3 position)
+        {
+            agent.SetDestination(position);
+            agent.speed = speed * 1.5f;
+        }
+
+        public void UpdateGravity()
+        {
+        }
+    }
+
+    public class MonsterComponent : CharacterComponent, IEnemy
+    {
+        public Henchmen henchmen { get; private set; }
+
+        public override void Initialize()
+        {
+            base.Initialize();
+            henchmen = new(this);
+            SetController(henchmen);
+            henchmen.Team = Team.Monster;
+
+            StartCoroutine(WaitAndActiveAgent());
+        }
+
+
+        IEnumerator WaitAndActiveAgent()
+        {
+            yield return new WaitForSeconds(1f);
+            GetComponent<NavMeshAgent>().enabled = true;
         }
     }
 }

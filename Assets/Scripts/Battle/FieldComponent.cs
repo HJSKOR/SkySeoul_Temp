@@ -1,62 +1,88 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 namespace Battle
 {
     public class FieldComponent : MonoBehaviour
     {
-        public float _interval = 3;
-        public float _t = 0;
-        private enum CommanderType { Near, Random, NearStop };
-        [SerializeField] private CommanderType type;
-        private void ChangeCommander(CommanderType type)
+        public float interval = 3;
+        float t = 0;
+        enum CommanderType { Near, Random, NearStop };
+        [SerializeField] private CommanderType type = CommanderType.Random;
+        public List<MonsterComponent> enemys = new();
+
+        public void Add(MonsterComponent enemy)
         {
-            _commander?.Dispose();
-            _commander = type switch
-            {
-                CommanderType.Near => new NearCommander(FieldRadius,transform.position),
-                CommanderType.Random => new RandomCommander(FieldRadius, transform.position),
-                CommanderType.NearStop => new NearStopCommander(FieldRadius, transform.position),
-                _ => new NearCommander(FieldRadius, transform.position)
-            };
+            enemys.Add(enemy);
         }
-        private CommanderType _preType;
-        private void Update()
+        public void Remove(MonsterComponent enemy)
+        {
+            enemys.Remove(enemy);
+            commander.FreeHenchmen(enemy.henchmen);
+        }
+
+        void ChangeCommander(CommanderType type)
+        {
+            commander?.Dispose();
+            commander = type switch
+            {
+                CommanderType.Near => new NearCommander(Size.x, Size.z, pivot),
+                CommanderType.Random => new RandomCommander(Size.x, Size.z, pivot),
+                CommanderType.NearStop => new NearStopCommander(Size.x, Size.z, pivot),
+                _ => new NearStopCommander(Size.x, Size.z, pivot)
+            };
+            for (int i = 0; i < enemys.Count; i++)
+            {
+                commander.AddHenchmen(enemys[i].henchmen);
+            }
+        }
+        CommanderType _preType;
+        void Update()
         {
             if (_preType != type)
             {
                 ChangeCommander(type);
                 _preType = type;
             }
-            _t += Time.deltaTime;
-            if (_interval < _t)
+            t += Time.deltaTime;
+            if (interval < t)
             {
-                _t = 0;
+                t = 0;
                 UpdateCommand();
             }
         }
 
-        [Range(1, 100)] public int FieldRadius = 1;
-        private Commander<byte> _commander;
-
+        [Min(1)] public Vector3Int Size = Vector3Int.one;
+        Commander<byte> commander;
+        float CellSize = 1f;
         public void UpdateCommand()
         {
-            _commander.UpdateCommand();
+            commander?.UpdateCommand();
         }
-        private void Awake()
+        void Awake()
         {
+            Initialize();
+        }
+        Vector3 cell;
+        Vector3 pivot;
+        public void Initialize()
+        {
+            cell = (Vector3.right + Vector3.forward) * CellSize + Vector3.up * 0.2f;
+            pivot = transform.position
+                          + new Vector3(cell.x / 2f, cell.y / 2, cell.z / 2f);
+
             ChangeCommander(type);
         }
-        private void OnDrawGizmos()
+        void OnDrawGizmos()
         {
-            for (int i = -FieldRadius; i < FieldRadius; i++)
+            Gizmos.color = Color.yellow;
+
+            for (int z = 0; z < Size.z; z++)
             {
-                for (int j = -FieldRadius; j < FieldRadius; j++)
+                for (int x = 0; x < Size.x; x++)
                 {
-                    var pos = transform.position;
-                    pos.x += i;
-                    pos.z += j;
-                    Gizmos.color = Color.black;
-                    Gizmos.DrawWireCube(pos, Vector3.one + Vector3.down * 0.9f);
+                    Vector3 offset = new Vector3(x * CellSize, 0, z * CellSize);
+                    Vector3 cellCenter = pivot + offset;
+                    Gizmos.DrawWireCube(cellCenter, cell);
                 }
             }
         }
